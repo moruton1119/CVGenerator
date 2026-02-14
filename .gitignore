@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 Doc/
 *.pdf
 *.xls
@@ -7,3 +8,9 @@ resume.json
 20260215.json
 resume_data.json
 resume_import.json
+=======
+Doc/
+*.pdf
+*.xls
+*Zone.Identifier
+>>>>>>> Stashed changes
