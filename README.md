@@ -23,3 +23,8 @@
 - `index.html`: アプリケーション本体
 - `style.css`: スタイルシート（印刷用スタイル含む）
 - `script.js`: アプリケーションの動作ロジック
+
+## デプロイ
+
+このプロジェクトはGitHub Pagesでホスティングされています：
+https://moruton1119.github.io/CVGenerator/
