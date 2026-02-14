@@ -1,0 +1,683 @@
+:root {
+    /* Modern Color Palette */
+    --primary-color: #4f46e5;
+    /* Indigo 600 */
+    --primary-hover: #4338ca;
+    /* Indigo 700 */
+    --secondary-color: #64748b;
+    /* Slate 500 */
+    --danger-color: #ef4444;
+    /* Red 500 */
+    --danger-bg: #fee2e2;
+    /* Red 100 */
+
+    --background-color: #f1f5f9;
+    /* Slate 100 */
+    --header-bg: #ffffff;
+    /* White */
+    --surface-color: #ffffff;
+    /* White */
+
+    --text-color: #1e293b;
+    /* Slate 800 */
+    --text-light: #64748b;
+    /* Slate 500 */
+    --border-color: #e2e8f0;
+    /* Slate 200 */
+
+    /* Effects */
+    --radius: 12px;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+    --font-family: 'Inter', 'Noto Sans JP', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.5;
+    /* Slightly tighter */
+    font-size: 14px;
+    /* Smaller base font size */
+    background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+/* Header */
+.app-header {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+    padding: 1rem 0;
+    margin-bottom: 3rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.app-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.app-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-color), #818cf8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.025em;
+}
+
+.actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* Layout */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.resume-container {
+    background-color: var(--surface-color);
+    padding: 4rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    min-height: 100vh;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    margin-bottom: 4rem;
+}
+
+.resume-section {
+    margin-bottom: 4rem;
+    position: relative;
+}
+
+.resume-section:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: -2rem;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border-color), transparent);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    position: relative;
+    padding-left: 0;
+    /* Removing border-left style */
+}
+
+/* Replacing border-left with a subtle dot */
+.section-title::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    vertical-align: middle;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+
+/* Forms */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+}
+
+input,
+textarea {
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background-color: #f8fafc;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #cbd5e1;
+    font-weight: 400;
+}
+
+input:hover,
+textarea:hover {
+    border-color: #cbd5e1;
+    background-color: #fff;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.form-group:focus-within label {
+    color: var(--primary-color);
+}
+
+textarea {
+    resize: none;
+    min-height: 120px;
+    line-height: 1.7;
+    overflow: hidden;
+}
+
+/* Dynamic Lists */
+.dynamic-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.item-card {
+    background-color: #fff;
+    border-bottom: none;
+    padding: 0;
+    margin-top: -1px;
+    /* Collapse borders */
+}
+
+.experience-item:first-child,
+.education-item:first-child {
+    margin-top: 0;
+}
+
+.experience-item:first-child,
+.education-item:first-child {
+    margin-top: 0;
+}
+
+/* Table-like Layout for Experience/Education */
+/* Table-like Layout for Experience/Education */
+.experience-item .form-grid,
+.education-item .form-grid {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 0;
+    border: 1px solid var(--border-color);
+}
+
+.cell-date {
+    background-color: #fafafa;
+    padding: 1rem;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    justify-content: center;
+    /* Center dates vertically if desired, or start */
+    justify-content: flex-start;
+}
+
+.cell-content {
+    background-color: #fff;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Date Range Styling */
+.cell-date .form-group {
+    margin-bottom: 0;
+}
+
+.date-separator {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.9em;
+    padding: 0;
+}
+
+/* Row Group for Company/Position */
+.row-group {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Content Styling */
+/* Company/Institution and Position/Degree */
+.input-company,
+.input-institution {
+    font-weight: 700;
+    font-size: 1.1em;
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    width: auto;
+    flex-grow: 1;
+}
+
+.input-position,
+.input-degree {
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    padding: 0;
+    width: auto;
+    flex-grow: 1;
+    text-align: right;
+}
+
+/* Adjust Date Inputs */
+.input-startDate,
+.input-endDate,
+.input-gradDate {
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 0.95em;
+    width: 100%;
+    color: var(--text-color);
+    text-align: center;
+}
+
+/* Description becomes full width under the content column */
+.input-description {
+    border: none;
+    padding: 0;
+    background: transparent;
+    min-height: auto;
+    resize: none;
+    width: 100%;
+    font-size: 0.95em;
+    line-height: 1.6;
+    margin-top: 0.5rem;
+}
+
+/* Visual grouping for dates */
+.experience-item .form-group:nth-child(3) {
+    margin-bottom: 0;
+    /* Connect Start Date visually */
+}
+
+.experience-item .form-group:nth-child(4)::before {
+    content: "〜 ";
+    display: inline-block;
+    margin-right: 4px;
+    font-size: 0.9em;
+    color: var(--text-light);
+}
+
+/* Bold Company Name */
+.input-company,
+.input-institution {
+    font-weight: 700;
+    font-size: 1.1em;
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.input-position,
+.input-degree {
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    padding: 0;
+    width: 100%;
+}
+
+/* Adjust Date Inputs */
+.input-startDate,
+.input-endDate,
+.input-gradDate {
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 0.9em;
+    width: 100%;
+    color: var(--text-light);
+}
+
+/* Labels: Hide or Make Small */
+.experience-item label,
+.education-item label {
+    display: none;
+    /* Hide labels for cleaner table look */
+}
+
+/* Make textarea blend in */
+.input-description {
+    border: none;
+    padding: 0;
+    background: transparent;
+    min-height: auto;
+    resize: none;
+    width: 100%;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+
+.item-card:hover {
+    background-color: #fafafa;
+    /* Subtle hover highlight */
+}
+
+.btn-remove {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    font-size: 1.25rem;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    opacity: 0.6;
+}
+
+.btn-remove:hover {
+    opacity: 1;
+    background-color: var(--danger-bg);
+    color: var(--danger-color);
+    border-color: transparent;
+    transform: rotate(90deg);
+}
+
+/* Buttons */
+.btn {
+    padding: 0.6rem 1.25rem;
+    border: none;
+    border-radius: 99px;
+    /* Pill shape */
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.01em;
+}
+
+.btn.primary {
+    background: linear-gradient(135deg, var(--primary-color), #4338ca);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+}
+
+.btn.primary:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 8px -1px rgba(79, 70, 229, 0.4);
+}
+
+.btn.secondary {
+    background-color: white;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn.secondary:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+.btn.danger {
+    background-color: white;
+    border: 1px solid #fecaca;
+    color: var(--danger-color);
+}
+
+.btn.danger:hover {
+    background-color: #fef2f2;
+    border-color: var(--danger-color);
+}
+
+.btn.small {
+    padding: 0.4rem 1rem;
+    font-size: 0.75rem;
+    border-radius: 8px;
+    /* Slightly squarer for secondary/add actions */
+    background-color: #e0e7ff;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.btn.small:hover {
+    background-color: #c7d2fe;
+}
+
+
+/* Footer */
+.app-footer {
+    text-align: center;
+    padding: 3rem 0;
+    color: var(--text-light);
+    font-size: 0.875rem;
+    opacity: 0.7;
+}
+
+/* PRINT STYLES - Optimized for paper */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+        background-image: none;
+        color: black;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .resume-container {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        max-width: none;
+    }
+
+    .resume-section {
+        margin-bottom: 2rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #000;
+    }
+
+    .resume-section::after {
+        display: none;
+    }
+
+    /* Prevent breaking inside headers */
+    .section-header,
+    .section-title {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .section-title {
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    .section-title {
+        color: #000;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        /* Revert to border style for print clarity */
+        padding-left: 0;
+        border-bottom: none;
+    }
+
+    .section-title::before {
+        display: none;
+    }
+
+    label {
+        color: #666;
+        font-size: 0.7rem;
+        margin-bottom: 2px;
+    }
+
+    input,
+    textarea {
+        border: none;
+        background: transparent;
+        padding: 0;
+        margin-bottom: 0.5rem;
+        color: #000;
+        font-weight: 500;
+        width: 100%;
+        box-shadow: none;
+    }
+
+    /* Make inputs look like text when printing */
+    input::placeholder,
+    textarea::placeholder {
+        color: transparent;
+    }
+
+    .item-card {
+        border: none;
+        padding: 0;
+        background: transparent;
+        box-shadow: none;
+        margin-bottom: 1.5rem;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .item-card:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Prevent breaking inside specific sections that should stay together */
+    #section-summary,
+    #section-education,
+    #section-skills {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .form-grid {
+        gap: 0.5rem 1rem;
+    }
+
+    /* Specifically for Experience/Education items in print */
+    /* Custom Print Layout for Experience Items */
+    .experience-item .form-grid,
+    .education-item .form-grid {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        border: 1px solid #000;
+        gap: 0;
+    }
+
+    .cell-date {
+        border-right: 1px solid #000;
+        padding: 0.5rem;
+    }
+
+    .cell-content {
+        padding: 0.5rem;
+    }
+
+    .input-company,
+    .input-institution {
+        font-weight: 800;
+        font-size: 1.05rem;
+    }
+
+    .input-position,
+    .input-degree {
+        font-style: italic;
+    }
+
+    .experience-item .input-company {
+        font-weight: 800;
+        font-size: 1.05rem;
+    }
+
+    .experience-item .input-position {
+        font-style: italic;
+    }
+
+    .experience-item .input-startDate,
+    .experience-item .input-endDate {
+        color: #000;
+    }
+
+    /* Hiding helper text or making layouts cleaner */
+    .form-group {
+        margin-bottom: 0.25rem;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}

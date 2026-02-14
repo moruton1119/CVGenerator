@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Helper - 履歴書情報収集</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <header class="app-header no-print">
+        <div class="container">
+            <h1>Resume Helper</h1>
+            <div class="actions">
+                <button id="btn-save-json" class="btn secondary">JSON保存</button>
+                <button id="btn-load-json" class="btn secondary">JSON読込</button>
+                <input type="file" id="file-input" style="display: none;" accept=".json">
+                <button id="btn-print" class="btn primary">PDF保存 / 印刷</button>
+                <button id="btn-clear" class="btn danger">クリア</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container resume-container">
+        <!-- Personal Information -->
+        <section id="section-personal" class="resume-section">
+            <h2 class="section-title">基本情報 (Personal Information)</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="fullName">氏名 (Full Name)</label>
+                    <input type="text" id="fullName" name="fullName" placeholder="例: 山田 太郎">
+                </div>
+                <div class="form-group">
+                    <label for="jobTitle">希望職種 / 現在の肩書き (Job Title)</label>
+                    <input type="text" id="jobTitle" name="jobTitle" placeholder="例: Webエンジニア">
+                </div>
+                <div class="form-group">
+                    <label for="email">メールアドレス (Email)</label>
+                    <input type="email" id="email" name="email" placeholder="example@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="phone">電話番号 (Phone)</label>
+                    <input type="tel" id="phone" name="phone" placeholder="090-1234-5678">
+                </div>
+                <div class="form-group full-width">
+                    <label for="location">住所 / 居住地 (Location)</label>
+                    <input type="text" id="location" name="location" placeholder="東京都渋谷区...">
+                </div>
+                <div class="form-group full-width">
+                    <label for="website">Webサイト / ポートフォリオ (Website/Links)</label>
+                    <input type="url" id="website" name="website" placeholder="https://...">
+                </div>
+            </div>
+        </section>
+
+        <!-- Professional Summary -->
+        <section id="section-summary" class="resume-section">
+            <h2 class="section-title">自己PR / 概要 (Professional Summary)</h2>
+            <div class="form-group full-width">
+                <textarea id="summary" name="summary" rows="5" placeholder="あなたの経歴や強みを簡潔に記入してください..."></textarea>
+            </div>
+        </section>
+
+        <!-- Work Experience -->
+        <section id="section-experience" class="resume-section">
+            <div class="section-header">
+                <h2 class="section-title">職務経歴 (Work Experience)</h2>
+                <button type="button" class="btn small no-print" onclick="addExperience()">+ 追加</button>
+            </div>
+            <div id="experience-list" class="dynamic-list">
+                <!-- Dynamic Content -->
+            </div>
+        </section>
+
+        <!-- Education -->
+        <section id="section-education" class="resume-section">
+            <div class="section-header">
+                <h2 class="section-title">学歴 (Education)</h2>
+                <button type="button" class="btn small no-print" onclick="addEducation()">+ 追加</button>
+            </div>
+            <div id="education-list" class="dynamic-list">
+                <!-- Dynamic Content -->
+            </div>
+        </section>
+
+        <!-- Skills -->
+        <section id="section-skills" class="resume-section">
+            <h2 class="section-title">スキル (Skills)</h2>
+            <div class="form-group full-width">
+                <label for="skills">スキル一覧 (カンマ区切り、または改行で入力)</label>
+                <textarea id="skills" name="skills" rows="3"
+                    placeholder="JavaScript, Python, React, Project Management, ..."></textarea>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="app-footer no-print">
+        <p>&copy; 2026 Resume Helper By Antigravity</p>
+    </footer>
+
+    <!-- Templates -->
+    <template id="template-experience">
+        <div class="experience-item item-card">
+            <button type="button" class="btn-remove no-print" onclick="removeParent(this)">&times;</button>
+            <div class="form-grid">
+                <div class="cell-date">
+                    <div class="form-group">
+                        <label class="input-label">開始日 (Start)</label>
+                        <input type="text" class="input-startDate" placeholder="YYYY/MM">
+                    </div>
+                    <span class="date-separator no-print">〜</span>
+                    <div class="form-group">
+                        <label class="input-label">終了日 (End)</label>
+                        <input type="text" class="input-endDate" placeholder="YYYY/MM or Present">
+                    </div>
+                </div>
+                <div class="cell-content">
+                    <div class="form-group row-group">
+                        <div class="field-block">
+                            <label class="input-label">会社名 (Company)</label>
+                            <input type="text" class="input-company" placeholder="例: 株式会社〇〇">
+                        </div>
+                        <div class="field-block">
+                            <label class="input-label">雇用形態 (Status)</label>
+                            <input type="text" class="input-status" placeholder="例: 正社員">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="input-label">役職 (Position)</label>
+                        <input type="text" class="input-position" placeholder="例: リーダー">
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="input-label">業務内容 (Description)</label>
+                        <textarea class="input-description" rows="3" placeholder="主な実績や業務内容を入力..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="template-education">
+        <div class="education-item item-card">
+            <button type="button" class="btn-remove no-print" onclick="removeParent(this)">&times;</button>
+            <div class="form-grid">
+                <div class="cell-date">
+                    <div class="form-group">
+                        <label>卒業年月 (Graduation Date)</label>
+                        <input type="text" class="input-gradDate" placeholder="YYYY/MM">
+                    </div>
+                </div>
+                <div class="cell-content">
+                    <div class="form-group row-group">
+                        <input type="text" class="input-institution" placeholder="大学・専門学校名">
+                        <input type="text" class="input-degree" placeholder="学部・学科・学位">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
