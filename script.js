@@ -37,7 +37,7 @@ function saveData() {
             website: getValue('website')
         },
         summary: getValue('summary'),
-        experience: getDynamicList('experience-list', ['.input-company', '.input-position', '.input-startDate', '.input-endDate', '.input-description']),
+        experience: getDynamicList('experience-list', ['.input-company', '.input-position', '.input-status', '.input-startDate', '.input-endDate', '.input-description']),
         education: getDynamicList('education-list', ['.input-institution', '.input-degree', '.input-gradDate']),
         skills: getValue('skills')
     };
@@ -206,12 +206,17 @@ function addExperience(data = {}) {
 
     if (data.company) clone.querySelector('.input-company').value = data.company;
     if (data.position) clone.querySelector('.input-position').value = data.position;
+    if (data.status) clone.querySelector('.input-status').value = data.status;
     if (data.startDate) clone.querySelector('.input-startDate').value = data.startDate;
     if (data.endDate) clone.querySelector('.input-endDate').value = data.endDate;
     if (data.description) clone.querySelector('.input-description').value = data.description;
 
     setupDynamicInputs(clone);
     document.getElementById('experience-list').appendChild(clone);
+
+    // Trigger auto-resize for all textareas in this new item
+    const newItem = document.getElementById('experience-list').lastElementChild;
+    newItem.querySelectorAll('textarea').forEach(el => autoResize(el));
 }
 
 // Dynamic Add: Education
@@ -225,6 +230,10 @@ function addEducation(data = {}) {
 
     setupDynamicInputs(clone);
     document.getElementById('education-list').appendChild(clone);
+
+    // Trigger auto-resize for all textareas in this new item
+    const newItem = document.getElementById('education-list').lastElementChild;
+    newItem.querySelectorAll('textarea').forEach(el => autoResize(el));
 }
 
 function setupDynamicInputs(fragment) {

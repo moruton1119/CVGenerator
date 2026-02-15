@@ -170,10 +170,12 @@ label {
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--text-light);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.2rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     transition: color 0.2s;
+    display: block;
+    /* Ensure visibility */
 }
 
 input,
@@ -298,27 +300,65 @@ textarea {
 
 /* Content Styling */
 /* Company/Institution and Position/Degree */
+/* Input styling for editing mode - Make them look like inputs */
 .input-company,
-.input-institution {
-    font-weight: 700;
-    font-size: 1.1em;
-    border: none;
-    background: transparent;
-    padding: 0;
-    margin: 0;
-    width: auto;
-    flex-grow: 1;
+.input-institution,
+.input-position,
+.input-degree,
+.input-status,
+.input-startDate,
+.input-endDate,
+.input-gradDate,
+.input-description {
+    border: 1px solid #d1d5db;
+    /* Visible border */
+    background-color: #f9fafb;
+    /* Light bg */
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.95em;
+    width: 100%;
+    margin-top: 0.2rem;
+    font-weight: normal;
+    /* Reset bold during edit */
+    resize: none;
+    /* No manual resize */
+    overflow: hidden;
+    /* Hide scrollbar for auto-resize */
+    font-family: inherit;
+    /* inherit font */
+    min-height: 38px;
+    /* Approximate height of single line input */
 }
 
-.input-position,
-.input-degree {
-    font-weight: 500;
-    border: none;
-    background: transparent;
-    padding: 0;
-    width: auto;
-    flex-grow: 1;
-    text-align: right;
+.input-company:focus,
+.input-institution:focus,
+.input-position:focus,
+.input-degree:focus,
+.input-status:focus,
+.input-startDate:focus,
+.input-endDate:focus,
+.input-gradDate:focus,
+.input-description:focus {
+    border-color: var(--primary-color);
+    background-color: #fff;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.field-block {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Row Group for Company/Position/Status */
+.row-group {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    /* Align top because of labels */
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
 }
 
 /* Adjust Date Inputs */
@@ -598,9 +638,68 @@ textarea {
     }
 
     /* Make inputs look like text when printing */
-    input::placeholder,
-    textarea::placeholder {
-        color: transparent;
+    /* Print Specific Formatting */
+    label,
+    .input-label {
+        display: none !important;
+    }
+
+    .input-company,
+    .input-institution,
+    .input-position,
+    .input-degree,
+    .input-status,
+    .input-startDate,
+    .input-endDate,
+    .input-gradDate,
+    .input-description {
+        border: none;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        /* Allow taking full width */
+        box-shadow: none;
+        resize: none;
+        min-height: auto;
+    }
+
+    .row-group {
+        gap: 0.5rem;
+        margin-bottom: 0.2rem;
+        align-items: baseline;
+    }
+
+    .field-block {
+        display: block;
+        width: 100%;
+    }
+
+    .input-company,
+    .input-institution {
+        font-weight: 800;
+        font-size: 1.1rem;
+        display: block;
+    }
+
+    .input-status {
+        font-size: 0.9rem;
+        display: block;
+        margin-top: 0.2rem;
+    }
+
+    .input-position,
+    .input-degree {
+        display: block;
+        font-weight: 600;
+        margin-top: 0.2rem;
+    }
+
+    .input-description {
+        display: block;
+        margin-top: 0.5rem;
+        width: 100%;
+        line-height: 1.5;
     }
 
     .item-card {
