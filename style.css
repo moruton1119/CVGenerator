@@ -25,6 +25,14 @@
     --border-color: #e2e8f0;
     /* Slate 200 */
 
+    /* Tag Colors */
+    --tag-bg: #eef2ff;
+    /* Indigo 50 */
+    --tag-text: #4338ca;
+    /* Indigo 700 */
+    --tag-border: #c7d2fe;
+    /* Indigo 200 */
+
     /* Effects */
     --radius: 12px;
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -45,9 +53,7 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     line-height: 1.5;
-    /* Slightly tighter */
     font-size: 14px;
-    /* Smaller base font size */
     background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
     background-size: 24px 24px;
 }
@@ -57,17 +63,26 @@ body {
     background-color: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(226, 232, 240, 0.6);
-    padding: 1rem 0;
+    padding: 1rem 0 0;
     margin-bottom: 3rem;
     position: sticky;
     top: 0;
     z-index: 100;
 }
 
-.app-header .container {
+.header-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-bottom: 1rem;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
 }
 
 .app-header h1 {
@@ -80,9 +95,79 @@ body {
     letter-spacing: -0.025em;
 }
 
+/* Progress Bar */
+.progress-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.progress-bar {
+    width: 200px;
+    height: 8px;
+    background-color: var(--border-color);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-color), #818cf8);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+}
+
+.progress-text {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
 .actions {
     display: flex;
     gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Template Selector */
+.template-dropdown {
+    cursor: pointer;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* Tab Navigation */
+.tab-nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.tab-btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    bottom: -2px;
+    border-bottom: 3px solid transparent;
+}
+
+.tab-btn:hover {
+    color: var(--primary-color);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
 }
 
 /* Layout */
@@ -132,10 +217,8 @@ body {
     font-weight: 700;
     position: relative;
     padding-left: 0;
-    /* Removing border-left style */
 }
 
-/* Replacing border-left with a subtle dot */
 .section-title::before {
     content: '';
     display: inline-block;
@@ -175,7 +258,6 @@ label {
     letter-spacing: 0.05em;
     transition: color 0.2s;
     display: block;
-    /* Ensure visibility */
 }
 
 input,
@@ -234,20 +316,14 @@ textarea {
     border-bottom: none;
     padding: 0;
     margin-top: -1px;
-    /* Collapse borders */
 }
 
 .experience-item:first-child,
-.education-item:first-child {
+.education-item:first-child,
+.certification-item:first-child {
     margin-top: 0;
 }
 
-.experience-item:first-child,
-.education-item:first-child {
-    margin-top: 0;
-}
-
-/* Table-like Layout for Experience/Education */
 /* Table-like Layout for Experience/Education */
 .experience-item .form-grid,
 .education-item .form-grid {
@@ -264,8 +340,6 @@ textarea {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    justify-content: center;
-    /* Center dates vertically if desired, or start */
     justify-content: flex-start;
 }
 
@@ -293,14 +367,18 @@ textarea {
 .row-group {
     display: flex;
     gap: 1rem;
-    align-items: baseline;
-    margin-bottom: 0.5rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
     flex-wrap: wrap;
 }
 
-/* Content Styling */
-/* Company/Institution and Position/Degree */
-/* Input styling for editing mode - Make them look like inputs */
+.field-block {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Input styling for experience cards */
 .input-company,
 .input-institution,
 .input-position,
@@ -311,24 +389,17 @@ textarea {
 .input-gradDate,
 .input-description {
     border: 1px solid #d1d5db;
-    /* Visible border */
     background-color: #f9fafb;
-    /* Light bg */
     padding: 0.5rem;
     border-radius: 4px;
     font-size: 0.95em;
     width: 100%;
     margin-top: 0.2rem;
     font-weight: normal;
-    /* Reset bold during edit */
     resize: none;
-    /* No manual resize */
     overflow: hidden;
-    /* Hide scrollbar for auto-resize */
     font-family: inherit;
-    /* inherit font */
     min-height: 38px;
-    /* Approximate height of single line input */
 }
 
 .input-company:focus,
@@ -345,22 +416,6 @@ textarea {
     box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
 }
 
-.field-block {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Row Group for Company/Position/Status */
-.row-group {
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-    /* Align top because of labels */
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-}
-
 /* Adjust Date Inputs */
 .input-startDate,
 .input-endDate,
@@ -368,37 +423,10 @@ textarea {
     border: none;
     background: transparent;
     padding: 0;
-    font-size: 0.95em;
-    width: 100%;
-    color: var(--text-color);
-    text-align: center;
-}
-
-/* Description becomes full width under the content column */
-.input-description {
-    border: none;
-    padding: 0;
-    background: transparent;
-    min-height: auto;
-    resize: none;
-    width: 100%;
-    font-size: 0.95em;
-    line-height: 1.6;
-    margin-top: 0.5rem;
-}
-
-/* Visual grouping for dates */
-.experience-item .form-group:nth-child(3) {
-    margin-bottom: 0;
-    /* Connect Start Date visually */
-}
-
-.experience-item .form-group:nth-child(4)::before {
-    content: "〜 ";
-    display: inline-block;
-    margin-right: 4px;
     font-size: 0.9em;
+    width: 100%;
     color: var(--text-light);
+    text-align: center;
 }
 
 /* Bold Company Name */
@@ -422,26 +450,13 @@ textarea {
     width: 100%;
 }
 
-/* Adjust Date Inputs */
-.input-startDate,
-.input-endDate,
-.input-gradDate {
-    border: none;
-    background: transparent;
-    padding: 0;
-    font-size: 0.9em;
-    width: 100%;
-    color: var(--text-light);
-}
-
-/* Labels: Hide or Make Small */
+/* Labels in experience/education: Hide */
 .experience-item label,
 .education-item label {
     display: none;
-    /* Hide labels for cleaner table look */
 }
 
-/* Make textarea blend in */
+/* Description styling */
 .input-description {
     border: none;
     padding: 0;
@@ -451,11 +466,11 @@ textarea {
     width: 100%;
     font-size: 0.95em;
     line-height: 1.6;
+    margin-top: 0.5rem;
 }
 
 .item-card:hover {
     background-color: #fafafa;
-    /* Subtle hover highlight */
 }
 
 .btn-remove {
@@ -475,6 +490,7 @@ textarea {
     justify-content: center;
     transition: all 0.2s;
     opacity: 0.6;
+    z-index: 10;
 }
 
 .btn-remove:hover {
@@ -485,12 +501,385 @@ textarea {
     transform: rotate(90deg);
 }
 
+/* ==================== TAG SYSTEM ==================== */
+.tag-input-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background-color: #f8fafc;
+    min-height: 42px;
+    transition: all 0.2s ease;
+}
+
+.tag-input-container:focus-within {
+    border-color: var(--primary-color);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.tags-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.65rem;
+    background-color: var(--tag-bg);
+    color: var(--tag-text);
+    border: 1px solid var(--tag-border);
+    border-radius: 99px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.tag:hover {
+    background-color: #e0e7ff;
+    border-color: #a5b4fc;
+}
+
+.tag .tag-remove {
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+    user-select: none;
+}
+
+.tag .tag-remove:hover {
+    opacity: 1;
+    color: var(--danger-color);
+}
+
+.tag-input {
+    flex: 1;
+    min-width: 120px;
+    border: none !important;
+    background: transparent !important;
+    padding: 0.25rem !important;
+    box-shadow: none !important;
+    font-size: 0.875rem;
+    outline: none;
+}
+
+.tag-input::placeholder {
+    color: #94a3b8;
+    font-size: 0.8rem;
+}
+
+/* Tech Tags inside Experience Cards */
+.tech-tags-group {
+    margin-top: 0.5rem;
+}
+
+.tech-tags-group label {
+    display: block !important;
+    font-size: 0.7rem;
+    margin-bottom: 0.3rem;
+}
+
+.tech-tags-group .tag-input-container {
+    border: 1px dashed var(--border-color);
+    background-color: #fafbfc;
+    padding: 0.4rem;
+}
+
+.tech-tags-group .tag-input-container:focus-within {
+    border-style: solid;
+}
+
+/* ==================== STRUCTURED SKILLS ==================== */
+.skills-structured {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.skill-category {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.skill-category > label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-color);
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+/* ==================== CERTIFICATIONS ==================== */
+.certification-item .cert-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    background-color: #fff;
+    transition: all 0.2s;
+}
+
+.certification-item .cert-grid:hover {
+    border-color: #cbd5e1;
+    box-shadow: var(--shadow-sm);
+}
+
+.certification-item label {
+    display: block !important;
+    font-size: 0.7rem;
+    margin-bottom: 0.3rem;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.certification-item .full-width {
+    grid-column: 1 / -1;
+}
+
+/* ==================== PREVIEW MODE ==================== */
+.preview-container {
+    padding: 4rem;
+}
+
+.preview-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 3px solid var(--primary-color);
+}
+
+.preview-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.preview-header .preview-jobtitle {
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.preview-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.preview-contact span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.preview-section {
+    margin-bottom: 2.5rem;
+}
+
+.preview-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-color);
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 1.25rem;
+}
+
+.preview-summary {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--text-color);
+    white-space: pre-wrap;
+}
+
+/* Preview Experience Cards (maintains table-style layout) */
+.preview-experience-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.preview-exp-card {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    border: 1px solid var(--border-color);
+    font-size: 0.9rem;
+}
+
+.preview-exp-card + .preview-exp-card {
+    border-top: none;
+}
+
+.preview-exp-date {
+    background-color: #f8fafc;
+    padding: 1rem;
+    border-right: 1px solid var(--border-color);
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.preview-exp-content {
+    padding: 1rem;
+}
+
+.preview-exp-company {
+    font-weight: 800;
+    font-size: 1.05rem;
+    margin-bottom: 0.2rem;
+}
+
+.preview-exp-status {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 0.3rem;
+}
+
+.preview-exp-position {
+    font-weight: 600;
+    font-style: italic;
+    margin-bottom: 0.5rem;
+}
+
+.preview-exp-description {
+    line-height: 1.6;
+    white-space: pre-wrap;
+    margin-bottom: 0.5rem;
+}
+
+.preview-tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+}
+
+.preview-tech-tags .tag {
+    font-size: 0.75rem;
+}
+
+/* Preview Skills */
+.preview-skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.preview-skill-category {
+    padding: 1rem;
+    background-color: #f8fafc;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+}
+
+.preview-skill-category h4 {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+/* Preview Education */
+.preview-edu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.preview-edu-card {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    border: 1px solid var(--border-color);
+    font-size: 0.9rem;
+}
+
+.preview-edu-card + .preview-edu-card {
+    border-top: none;
+}
+
+.preview-edu-date {
+    background-color: #f8fafc;
+    padding: 1rem;
+    border-right: 1px solid var(--border-color);
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.preview-edu-content {
+    padding: 1rem;
+}
+
+.preview-edu-institution {
+    font-weight: 800;
+    font-size: 1.05rem;
+}
+
+.preview-edu-degree {
+    font-style: italic;
+    color: var(--text-light);
+    margin-top: 0.2rem;
+}
+
+/* Preview Certifications */
+.preview-cert-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.preview-cert-item {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 0.75rem 1rem;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.preview-cert-date {
+    font-weight: 700;
+    color: var(--primary-color);
+    white-space: nowrap;
+    min-width: 80px;
+}
+
+.preview-cert-name {
+    font-weight: 600;
+}
+
+.preview-cert-issuer {
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.preview-empty {
+    color: var(--text-light);
+    font-style: italic;
+    padding: 1rem 0;
+}
+
+
 /* Buttons */
 .btn {
     padding: 0.6rem 1.25rem;
     border: none;
     border-radius: 99px;
-    /* Pill shape */
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -541,7 +930,6 @@ textarea {
     padding: 0.4rem 1rem;
     font-size: 0.75rem;
     border-radius: 8px;
-    /* Slightly squarer for secondary/add actions */
     background-color: #e0e7ff;
     color: var(--primary-color);
     font-weight: 700;
@@ -561,9 +949,21 @@ textarea {
     opacity: 0.7;
 }
 
-/* PRINT STYLES - Optimized for paper */
+/* ==================== PRINT STYLES ==================== */
 @media print {
     .no-print {
+        display: none !important;
+    }
+
+    .tab-nav {
+        display: none !important;
+    }
+
+    #preview-mode {
+        display: block !important;
+    }
+
+    #edit-mode {
         display: none !important;
     }
 
@@ -575,208 +975,79 @@ textarea {
         print-color-adjust: exact;
     }
 
-    .resume-container {
+    .app-header {
+        position: static;
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .resume-container,
+    .preview-container {
         box-shadow: none;
         border: none;
         padding: 0;
         margin: 0;
         width: 100%;
         max-width: none;
-    }
-
-    .resume-section {
-        margin-bottom: 2rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #000;
-    }
-
-    .resume-section::after {
-        display: none;
-    }
-
-    /* Prevent breaking inside headers */
-    .section-header,
-    .section-title {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-
-    .section-title {
-        break-after: avoid;
-        page-break-after: avoid;
-    }
-
-    .section-title {
-        color: #000;
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-        /* Revert to border style for print clarity */
-        padding-left: 0;
-        border-bottom: none;
-    }
-
-    .section-title::before {
-        display: none;
-    }
-
-    label {
-        color: #666;
-        font-size: 0.7rem;
-        margin-bottom: 2px;
-    }
-
-    input,
-    textarea {
-        border: none;
-        background: transparent;
-        padding: 0;
-        margin-bottom: 0.5rem;
-        color: #000;
-        font-weight: 500;
-        width: 100%;
-        box-shadow: none;
-    }
-
-    /* Make inputs look like text when printing */
-    /* Print Specific Formatting */
-    label,
-    .input-label {
-        display: none !important;
-    }
-
-    .input-company,
-    .input-institution,
-    .input-position,
-    .input-degree,
-    .input-status,
-    .input-startDate,
-    .input-endDate,
-    .input-gradDate,
-    .input-description {
-        border: none;
-        background: transparent;
-        padding: 0;
-        margin: 0;
-        width: 100%;
-        /* Allow taking full width */
-        box-shadow: none;
-        resize: none;
         min-height: auto;
     }
 
-    .row-group {
-        gap: 0.5rem;
-        margin-bottom: 0.2rem;
-        align-items: baseline;
-    }
-
-    .field-block {
-        display: block;
-        width: 100%;
-    }
-
-    .input-company,
-    .input-institution {
-        font-weight: 800;
-        font-size: 1.1rem;
-        display: block;
-    }
-
-    .input-status {
-        font-size: 0.9rem;
-        display: block;
-        margin-top: 0.2rem;
-    }
-
-    .input-position,
-    .input-degree {
-        display: block;
-        font-weight: 600;
-        margin-top: 0.2rem;
-    }
-
-    .input-description {
-        display: block;
-        margin-top: 0.5rem;
-        width: 100%;
-        line-height: 1.5;
-    }
-
-    .item-card {
-        border: none;
-        padding: 0;
-        background: transparent;
-        box-shadow: none;
+    .preview-header {
+        border-bottom: 2px solid #000;
         margin-bottom: 1.5rem;
-        break-inside: avoid;
-        page-break-inside: avoid;
+        padding-bottom: 1rem;
     }
 
-    .item-card:hover {
-        transform: none;
-        box-shadow: none;
+    .preview-header h1 {
+        font-size: 1.5rem;
     }
 
-    /* Prevent breaking inside specific sections that should stay together */
-    #section-summary,
-    #section-education,
-    #section-skills {
-        break-inside: avoid;
-        page-break-inside: avoid;
+    .preview-section {
+        margin-bottom: 1.5rem;
     }
 
-    .form-grid {
-        gap: 0.5rem 1rem;
+    .preview-section-title {
+        border-bottom: 2px solid #000;
+        font-size: 1rem;
     }
 
-    /* Specifically for Experience/Education items in print */
-    /* Custom Print Layout for Experience Items */
-    .experience-item .form-grid,
-    .education-item .form-grid {
-        display: grid;
-        grid-template-columns: 150px 1fr;
+    .preview-exp-card,
+    .preview-edu-card {
         border: 1px solid #000;
-        gap: 0;
-    }
-
-    .cell-date {
-        border-right: 1px solid #000;
-        padding: 0.5rem;
-    }
-
-    .cell-content {
-        padding: 0.5rem;
-    }
-
-    .input-company,
-    .input-institution {
-        font-weight: 800;
-        font-size: 1.05rem;
-    }
-
-    .input-position,
-    .input-degree {
-        font-style: italic;
-    }
-
-    .experience-item .input-company {
-        font-weight: 800;
-        font-size: 1.05rem;
-    }
-
-    .experience-item .input-position {
-        font-style: italic;
-    }
-
-    .experience-item .input-startDate,
-    .experience-item .input-endDate {
-        color: #000;
-    }
-
-    /* Hiding helper text or making layouts cleaner */
-    .form-group {
-        margin-bottom: 0.25rem;
+        font-size: 0.85rem;
         break-inside: avoid;
         page-break-inside: avoid;
+    }
+
+    .preview-exp-date,
+    .preview-edu-date {
+        background-color: #f5f5f5;
+        border-right: 1px solid #000;
+    }
+
+    .preview-skills-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .preview-skill-category {
+        background-color: #fafafa;
+        border: 1px solid #ccc;
+    }
+
+    .preview-cert-item {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .tag {
+        border: 1px solid #999 !important;
+        background-color: #f0f0f0 !important;
+        color: #333 !important;
+    }
+
+    .preview-empty {
+        display: none;
     }
 }
