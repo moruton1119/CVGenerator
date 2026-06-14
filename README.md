@@ -36,43 +36,37 @@ CVGenerator/
 
 ### 現在の仕組み
 
-GitHub Pages（`Deploy from a branch`）を使用。
-公開URLは `gh-pages` ブランチの内容が配信される。
+GitHub Actionsによる自動デプロイ。
+`master` ブランチにpushすると、自動的にGitHub Pagesにデプロイされる。
 
 ```
-[ master ]  開発ブランチ（ここで編集）
+[ master ]  開発ブランチ（ここで編集・push）
      │
-     ▼  masterの内容をgh-pagesにマージしてpush
-[ gh-pages ] ← GitHub Pagesがこのブランチを配信
+     ▼  pushすると自動でGitHub Actionsが実行
+[ GitHub Pages ] ← サイトが自動更新される
 ```
 
 ### デプロイ手順
 
 ```bash
-# 1. masterで編集・コミット
+# masterで編集・コミット・pushするだけ！
 git add -A
 git commit -m "変更内容"
 git push origin master
-
-# 2. gh-pagesにマージしてpush（これでサイトが更新される）
-git checkout gh-pages
-git merge master
-git push origin gh-pages
-git checkout master
+# → GitHub Actionsが自動でデプロイを実行
 ```
 
-⚠️ **重要:** masterにpushしただけではサイトは更新されない。`gh-pages`ブランチの更新が必要。
+数分後に https://moruton1119.github.io/CVGenerator/ に反映される。
 
-### 🔧 推奨: GitHub Actionsによる自動化（今後の改善案）
-
-上記の手動マージは忘れやすい。将来的にはGitHub Actionsで「masterにpushしたら自動でgh-pagesにデプロイ」する仕組み（[peaceiris/actions-gh-pages](https://github.com/peaceiris/actions-gh-pages) 等）を導入することを推奨。
+デプロイ状況は GitHub リポジトリの **Actions** タブで確認可能。
 
 ## 🌿 ブランチ構成
 
 | ブランチ | 役割 |
 |----------|------|
-| `master` | 開発のメインブランチ。最新のソースコード。 |
-| `gh-pages` | GitHub Pages配信用ブランチ。masterの内容をミラーする。 |
+| `master` | 開発のメインブランチ。pushすると自動デプロイされる。 |
+
+> **Note:** `gh-pages` ブランチは過去のデプロイ用に使用していた名残。現在は未使用（GitHub Actions経由でデプロイしているため削除可能）。
 
 ### 機能追加時のフロー
 
@@ -88,14 +82,9 @@ git commit -m "[機能追加] 機能の説明"
 git checkout master
 git merge feature/追加する機能名
 git push origin master
+# → GitHub Actionsが自動でデプロイを実行！
 
-# 4. gh-pagesに反映（デプロイ）
-git checkout gh-pages
-git merge master
-git push origin gh-pages
-git checkout master
-
-# 5. ブランチ削除（オプション）
+# 4. ブランチ削除（オプション）
 git branch -d feature/追加する機能名
 ```
 
