@@ -8,219 +8,362 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
+    <!-- ==================== HEADER ==================== -->
     <header class="app-header no-print">
-        <div class="container header-container">
+        <div class="header-inner">
             <div class="header-left">
-                <h1>CVGenerator</h1>
-                <!-- Progress Bar -->
-                <div class="progress-wrapper">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
-                    </div>
-                    <span class="progress-text" id="progress-text">入力完了度: 0%</span>
+                <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+                <h1 class="app-logo">CVGenerator</h1>
+            </div>
+            <div class="progress-wrapper">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
                 </div>
+                <span class="progress-text" id="progress-text">入力完了度: 0%</span>
             </div>
             <div class="actions">
-                <!-- Template Selector -->
-                <div class="template-selector">
-                    <select id="template-select" class="btn secondary template-dropdown">
-                        <option value="">📋 テンプレート選択</option>
-                        <option value="engineer">💻 エンジニア向け</option>
-                        <option value="designer">🎨 デザイナー向け</option>
-                        <option value="manager">📊 プロジェクトマネージャー向け</option>
-                        <option value="blank">⬜ 空白テンプレート</option>
-                    </select>
-                </div>
+                <select id="template-select" class="btn secondary template-dropdown">
+                    <option value="">📋 テンプレート</option>
+                    <option value="engineer">💻 エンジニア向け</option>
+                    <option value="designer">🎨 デザイナー向け</option>
+                    <option value="manager">📊 PM向け</option>
+                    <option value="blank">⬜ 空白</option>
+                </select>
                 <button id="btn-save-json" class="btn secondary">JSON保存</button>
                 <button id="btn-load-json" class="btn secondary">JSON読込</button>
-                <input type="file" id="file-input" style="display: none;" accept=".json">
-                <button id="btn-print" class="btn primary">PDF保存 / 印刷</button>
-                <button id="btn-clear" class="btn danger">クリア</button>
+                <input type="file" id="file-input" style="display:none" accept=".json">
+                <button id="btn-print" class="btn primary">📄 PDF出力</button>
+                <button id="btn-clear" class="btn danger">🗑️</button>
             </div>
         </div>
-
-        <!-- Tab Navigation -->
-        <nav class="tab-nav container">
-            <button class="tab-btn active" data-tab="edit">✏️ 入力</button>
-            <button class="tab-btn" data-tab="preview">👁️ プレビュー</button>
-        </nav>
     </header>
 
-    <!-- ==================== EDIT MODE ==================== -->
-    <main class="container resume-container" id="edit-mode">
-        <!-- Personal Information -->
-        <section id="section-personal" class="resume-section">
-            <h2 class="section-title">基本情報 (Personal Information)</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="fullName">氏名 (Full Name)</label>
-                    <input type="text" id="fullName" name="fullName" placeholder="例: 山田 太郎">
-                </div>
-                <div class="form-group">
-                    <label for="jobTitle">希望職種 / 現在の肩書き (Job Title)</label>
-                    <input type="text" id="jobTitle" name="jobTitle" placeholder="例: Webエンジニア">
-                </div>
-                <div class="form-group">
-                    <label for="email">メールアドレス (Email)</label>
-                    <input type="email" id="email" name="email" placeholder="example@email.com">
-                </div>
-                <div class="form-group">
-                    <label for="phone">電話番号 (Phone)</label>
-                    <input type="tel" id="phone" name="phone" placeholder="090-1234-5678">
-                </div>
-                <div class="form-group full-width">
-                    <label for="location">住所 / 居住地 (Location)</label>
-                    <input type="text" id="location" name="location" placeholder="東京都渋谷区...">
-                </div>
-                <div class="form-group full-width">
-                    <label for="website">Webサイト / ポートフォリオ (Website/Links)</label>
-                    <input type="url" id="website" name="website" placeholder="https://...">
-                </div>
-            </div>
-        </section>
+    <!-- ==================== LAYOUT ==================== -->
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar no-print" id="sidebar">
+            <nav class="sidebar-nav">
+                <button class="sidebar-item active" data-page="personal">
+                    <span class="sidebar-icon">👤</span>
+                    <span class="sidebar-label">基本情報</span>
+                </button>
+                <button class="sidebar-item" data-page="summary">
+                    <span class="sidebar-icon">💬</span>
+                    <span class="sidebar-label">自己PR</span>
+                </button>
+                <button class="sidebar-item" data-page="experience">
+                    <span class="sidebar-icon">💼</span>
+                    <span class="sidebar-label">経歴情報</span>
+                </button>
+                <button class="sidebar-item" data-page="skills">
+                    <span class="sidebar-icon">🏷️</span>
+                    <span class="sidebar-label">スキルセット</span>
+                </button>
+                <button class="sidebar-item" data-page="certifications">
+                    <span class="sidebar-icon">📜</span>
+                    <span class="sidebar-label">保有資格</span>
+                </button>
+                <div class="sidebar-divider"></div>
+                <button class="sidebar-item sidebar-preview" data-page="preview">
+                    <span class="sidebar-icon">👁️</span>
+                    <span class="sidebar-label">プレビュー</span>
+                </button>
+            </nav>
+        </aside>
 
-        <!-- Professional Summary -->
-        <section id="section-summary" class="resume-section">
-            <h2 class="section-title">自己PR / 概要 (Professional Summary)</h2>
-            <div class="form-group full-width">
-                <textarea id="summary" name="summary" rows="5" placeholder="あなたの経歴や強みを簡潔に記入してください..."></textarea>
-            </div>
-        </section>
+        <!-- Sidebar overlay (mobile) -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-        <!-- Work Experience -->
-        <section id="section-experience" class="resume-section">
-            <div class="section-header">
-                <h2 class="section-title">職務経歴 (Work Experience)</h2>
-                <button type="button" class="btn small no-print" onclick="addExperience()">+ 追加</button>
-            </div>
-            <div id="experience-list" class="dynamic-list">
-                <!-- Dynamic Content -->
-            </div>
-        </section>
+        <!-- ==================== MAIN CONTENT ==================== -->
+        <main class="main-content">
 
-        <!-- Education -->
-        <section id="section-education" class="resume-section">
-            <div class="section-header">
-                <h2 class="section-title">学歴 (Education)</h2>
-                <button type="button" class="btn small no-print" onclick="addEducation()">+ 追加</button>
-            </div>
-            <div id="education-list" class="dynamic-list">
-                <!-- Dynamic Content -->
-            </div>
-        </section>
+            <!-- ═══════════════ PAGE: 基本情報 ═══════════════ -->
+            <div class="page-content active" id="page-personal">
+                <div class="page-header">
+                    <h2>基本情報</h2>
+                    <p class="page-subtitle">氏名や連絡先など、履歴書の基本となる情報を入力します</p>
+                </div>
 
-        <!-- Structured Skills -->
-        <section id="section-skills" class="resume-section">
-            <h2 class="section-title">スキル (Skills)</h2>
-            <div class="skills-structured">
-                <div class="skill-category">
-                    <label>プログラミング言語</label>
-                    <div class="tag-input-container">
-                        <div class="tags-display" data-skill-category="languages"></div>
-                        <input type="text" class="tag-input" data-skill-category="languages" placeholder="タグを入力してEnter (例: JavaScript, Python...)">
+                <!-- 大項目: 個人情報 -->
+                <section class="edit-section">
+                    <h3 class="edit-section-title">個人情報</h3>
+
+                    <!-- 中項目: 氏名 -->
+                    <div class="edit-subsection">
+                        <h4 class="edit-subsection-title">氏名</h4>
+                        <div class="edit-fields">
+                            <div class="edit-field">
+                                <label>氏名 <span class="required-badge">必須</span></label>
+                                <input type="text" id="fullName" placeholder="例: 山田 太郎" data-required>
+                            </div>
+                            <div class="edit-field">
+                                <label>フリガナ</label>
+                                <input type="text" id="fullNameKana" placeholder="例: ヤマダ タロウ">
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="skill-category">
-                    <label>フレームワーク・ライブラリ</label>
-                    <div class="tag-input-container">
-                        <div class="tags-display" data-skill-category="frameworks"></div>
-                        <input type="text" class="tag-input" data-skill-category="frameworks" placeholder="タグを入力してEnter (例: React, Vue, Spring...)">
+
+                    <!-- 中項目: 職種・肩書き -->
+                    <div class="edit-subsection">
+                        <h4 class="edit-subsection-title">職種・肩書き</h4>
+                        <div class="edit-fields">
+                            <div class="edit-field">
+                                <label>希望職種 / 現在の肩書き <span class="required-badge">必須</span></label>
+                                <input type="text" id="jobTitle" placeholder="例: Webエンジニア" data-required>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="skill-category">
-                    <label>ツール・ミドルウェア</label>
-                    <div class="tag-input-container">
-                        <div class="tags-display" data-skill-category="tools"></div>
-                        <input type="text" class="tag-input" data-skill-category="tools" placeholder="タグを入力してEnter (例: Git, Docker, MySQL...)">
+
+                    <!-- 中項目: 連絡先 -->
+                    <div class="edit-subsection">
+                        <h4 class="edit-subsection-title">連絡先</h4>
+                        <div class="edit-fields">
+                            <div class="edit-field">
+                                <label>メールアドレス <span class="required-badge">必須</span></label>
+                                <input type="email" id="email" placeholder="example@email.com" data-required>
+                            </div>
+                            <div class="edit-field">
+                                <label>電話番号 <span class="required-badge">必須</span></label>
+                                <input type="tel" id="phone" placeholder="090-1234-5678" data-required>
+                            </div>
+                            <div class="edit-field">
+                                <label>住所 / 居住地</label>
+                                <input type="text" id="location" placeholder="東京都渋谷区...">
+                            </div>
+                            <div class="edit-field">
+                                <label>Webサイト / ポートフォリオ</label>
+                                <input type="url" id="website" placeholder="https://...">
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="skill-category">
-                    <label>クラウド・インフラ</label>
-                    <div class="tag-input-container">
-                        <div class="tags-display" data-skill-category="cloud"></div>
-                        <input type="text" class="tag-input" data-skill-category="cloud" placeholder="タグを入力してEnter (例: AWS, Azure, GCP...)">
-                    </div>
-                </div>
-                <div class="skill-category">
-                    <label>その他</label>
-                    <div class="tag-input-container">
-                        <div class="tags-display" data-skill-category="other"></div>
-                        <input type="text" class="tag-input" data-skill-category="other" placeholder="タグを入力してEnter">
-                    </div>
+                </section>
+
+                <div class="page-actions">
+                    <button class="btn primary btn-save-section" onclick="saveSectionFeedback(this)">💾 保存</button>
                 </div>
             </div>
 
-        </section>
+            <!-- ═══════════════ PAGE: 自己PR ═══════════════ -->
+            <div class="page-content" id="page-summary">
+                <div class="page-header">
+                    <h2>自己PR</h2>
+                    <p class="page-subtitle">あなたの強みや経験をアピールします</p>
+                </div>
 
-        <!-- Certifications -->
-        <section id="section-certifications" class="resume-section">
-            <div class="section-header">
-                <h2 class="section-title">保有資格 (Certifications)</h2>
-                <button type="button" class="btn small no-print" onclick="addCertification()">+ 追加</button>
+                <section class="edit-section">
+                    <h3 class="edit-section-title">PR内容</h3>
+
+                    <div class="edit-subsection">
+                        <h4 class="edit-subsection-title">自己PR</h4>
+                        <div class="edit-fields">
+                            <div class="edit-field edit-field-full">
+                                <label>自己PR本文 <span class="required-badge">必須</span></label>
+                                <textarea id="summary" rows="6" placeholder="あなたの経歴や強みを簡潔に記入してください..." data-required></textarea>
+                                <span class="char-count" id="summary-count">0文字</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="page-actions">
+                    <button class="btn primary btn-save-section" onclick="saveSectionFeedback(this)">💾 保存</button>
+                </div>
             </div>
-            <div id="certification-list" class="dynamic-list">
-                <!-- Dynamic Content -->
+
+            <!-- ═══════════════ PAGE: 経歴情報 ═══════════════ -->
+            <div class="page-content" id="page-experience">
+                <div class="page-header">
+                    <h2>経歴情報</h2>
+                    <p class="page-subtitle">職務経歴と学歴を入力します</p>
+                </div>
+
+                <!-- 大項目: 職務経歴 -->
+                <section class="edit-section">
+                    <div class="edit-section-header">
+                        <h3 class="edit-section-title">職務経歴</h3>
+                        <button type="button" class="btn small" onclick="addExperience()">+ 経歴追加</button>
+                    </div>
+                    <div id="experience-list" class="dynamic-list">
+                        <!-- Dynamic -->
+                    </div>
+                </section>
+
+                <!-- 大項目: 学歴 -->
+                <section class="edit-section">
+                    <div class="edit-section-header">
+                        <h3 class="edit-section-title">学歴</h3>
+                        <button type="button" class="btn small" onclick="addEducation()">+ 学歴追加</button>
+                    </div>
+                    <div id="education-list" class="dynamic-list">
+                        <!-- Dynamic -->
+                    </div>
+                </section>
+
+                <div class="page-actions">
+                    <button class="btn primary btn-save-section" onclick="saveSectionFeedback(this)">💾 保存</button>
+                </div>
             </div>
-        </section>
 
-    </main>
+            <!-- ═══════════════ PAGE: スキルセット ═══════════════ -->
+            <div class="page-content" id="page-skills">
+                <div class="page-header">
+                    <h2>スキルセット</h2>
+                    <p class="page-subtitle">カテゴリ別にスキルをタグ入力します</p>
+                </div>
 
-    <!-- ==================== PREVIEW MODE ==================== -->
-    <main class="container resume-container preview-container" id="preview-mode" style="display: none;">
-        <!-- Preview content will be rendered here -->
-    </main>
+                <section class="edit-section">
+                    <h3 class="edit-section-title">技術スキル</h3>
+
+                    <div class="edit-subsection">
+                        <h4 class="edit-subsection-title">プログラミング言語 <span class="required-badge">必須</span></h4>
+                        <div class="edit-fields">
+                            <div class="edit-field edit-field-full">
+                                <div class="tag-input-container">
+                                    <div class="tags-display" data-skill-category="languages"></div>
+                                    <input type="text" class="tag-input" data-skill-category="languages" placeholder="タグを入力してEnter (例: JavaScript, Python...)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="edit-subsection">
+                        <h4 class="edit-subsection-title">フレームワーク・ライブラリ</h4>
+                        <div class="edit-fields">
+                            <div class="edit-field edit-field-full">
+                                <div class="tag-input-container">
+                                    <div class="tags-display" data-skill-category="frameworks"></div>
+                                    <input type="text" class="tag-input" data-skill-category="frameworks" placeholder="例: React, Vue, Spring...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="edit-subsection">
+                        <h4 class="edit-subsection-title">ツール・ミドルウェア</h4>
+                        <div class="edit-fields">
+                            <div class="edit-field edit-field-full">
+                                <div class="tag-input-container">
+                                    <div class="tags-display" data-skill-category="tools"></div>
+                                    <input type="text" class="tag-input" data-skill-category="tools" placeholder="例: Git, Docker, MySQL...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="edit-subsection">
+                        <h4 class="edit-subsection-title">クラウド・インフラ</h4>
+                        <div class="edit-fields">
+                            <div class="edit-field edit-field-full">
+                                <div class="tag-input-container">
+                                    <div class="tags-display" data-skill-category="cloud"></div>
+                                    <input type="text" class="tag-input" data-skill-category="cloud" placeholder="例: AWS, Azure, GCP...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="edit-subsection">
+                        <h4 class="edit-subsection-title">その他</h4>
+                        <div class="edit-fields">
+                            <div class="edit-field edit-field-full">
+                                <div class="tag-input-container">
+                                    <div class="tags-display" data-skill-category="other"></div>
+                                    <input type="text" class="tag-input" data-skill-category="other" placeholder="その他スキルを入力...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="page-actions">
+                    <button class="btn primary btn-save-section" onclick="saveSectionFeedback(this)">💾 保存</button>
+                </div>
+            </div>
+
+            <!-- ═══════════════ PAGE: 保有資格 ═══════════════ -->
+            <div class="page-content" id="page-certifications">
+                <div class="page-header">
+                    <h2>保有資格</h2>
+                    <p class="page-subtitle">取得している資格を追加します</p>
+                </div>
+
+                <section class="edit-section">
+                    <div class="edit-section-header">
+                        <h3 class="edit-section-title">資格一覧</h3>
+                        <button type="button" class="btn small" onclick="addCertification()">+ 資格追加</button>
+                    </div>
+                    <div id="certification-list" class="dynamic-list">
+                        <!-- Dynamic -->
+                    </div>
+                </section>
+
+                <div class="page-actions">
+                    <button class="btn primary btn-save-section" onclick="saveSectionFeedback(this)">💾 保存</button>
+                </div>
+            </div>
+
+            <!-- ═══════════════ PAGE: プレビュー ═══════════════ -->
+            <div class="page-content" id="page-preview">
+                <div class="page-header no-print">
+                    <h2>プレビュー</h2>
+                    <p class="page-subtitle">職務経歴書の完成イメージを確認できます</p>
+                </div>
+                <div id="preview-content"></div>
+            </div>
+
+        </main>
+    </div>
 
     <footer class="app-footer no-print">
         <p>&copy; 2026 CVGenerator By Antigravity</p>
     </footer>
 
+    <!-- Toast notification -->
+    <div class="toast" id="toast"></div>
+
     <!-- ==================== TEMPLATES ==================== -->
 
-    <!-- Experience Template (with tech tags) -->
     <template id="template-experience">
         <div class="experience-item item-card">
-            <button type="button" class="btn-remove no-print" onclick="removeParent(this)">&times;</button>
+            <button type="button" class="btn-remove" onclick="removeParent(this)">&times;</button>
             <div class="form-grid">
                 <div class="cell-date">
                     <div class="form-group">
-                        <label class="input-label">開始日 (Start)</label>
+                        <label class="input-label">開始日 <span class="required-badge">必須</span></label>
                         <input type="text" class="input-startDate" placeholder="YYYY/MM">
                     </div>
-                    <span class="date-separator no-print">〜</span>
+                    <span class="date-separator">〜</span>
                     <div class="form-group">
-                        <label class="input-label">終了日 (End)</label>
-                        <input type="text" class="input-endDate" placeholder="YYYY/MM or Present">
+                        <label class="input-label">終了日</label>
+                        <input type="text" class="input-endDate" placeholder="YYYY/MM">
                     </div>
                 </div>
                 <div class="cell-content">
                     <div class="form-group row-group">
                         <div class="field-block">
-                            <label class="input-label">会社名 (Company)</label>
+                            <label class="input-label">会社名 <span class="required-badge">必須</span></label>
                             <textarea class="input-company" rows="1" placeholder="例: 株式会社〇〇"></textarea>
                         </div>
                         <div class="field-block">
-                            <label class="input-label">雇用形態 (Status)</label>
+                            <label class="input-label">雇用形態</label>
                             <textarea class="input-status" rows="1" placeholder="例: 正社員"></textarea>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="input-label">役職 (Position)</label>
+                        <label class="input-label">役職</label>
                         <textarea class="input-position" rows="1" placeholder="例: リーダー"></textarea>
                     </div>
                     <div class="form-group full-width">
-                        <label class="input-label">業務内容 (Description)</label>
+                        <label class="input-label">業務内容 <span class="required-badge">必須</span></label>
                         <textarea class="input-description" rows="3" placeholder="主な実績や業務内容を入力..."></textarea>
                     </div>
-                    <!-- Tech Tags -->
                     <div class="form-group full-width tech-tags-group">
-                        <label class="input-label">使用技術 (Tech Tags)</label>
+                        <label class="input-label">使用技術</label>
                         <div class="tag-input-container">
                             <div class="tags-display tech-tags-display"></div>
                             <input type="text" class="tag-input tech-tag-input" placeholder="技術を入力してEnter (例: React, TypeScript...)">
@@ -231,14 +374,13 @@
         </div>
     </template>
 
-    <!-- Education Template -->
     <template id="template-education">
         <div class="education-item item-card">
-            <button type="button" class="btn-remove no-print" onclick="removeParent(this)">&times;</button>
+            <button type="button" class="btn-remove" onclick="removeParent(this)">&times;</button>
             <div class="form-grid">
                 <div class="cell-date">
                     <div class="form-group">
-                        <label>卒業年月 (Graduation Date)</label>
+                        <label>卒業年月</label>
                         <input type="text" class="input-gradDate" placeholder="YYYY/MM">
                     </div>
                 </div>
@@ -252,21 +394,20 @@
         </div>
     </template>
 
-    <!-- Certification Template -->
     <template id="template-certification">
         <div class="certification-item item-card">
-            <button type="button" class="btn-remove no-print" onclick="removeParent(this)">&times;</button>
-            <div class="form-grid cert-grid">
-                <div class="form-group">
-                    <label>資格名 (Certification Name)</label>
+            <button type="button" class="btn-remove" onclick="removeParent(this)">&times;</button>
+            <div class="cert-grid">
+                <div class="cert-field">
+                    <label>資格名 <span class="required-badge">必須</span></label>
                     <input type="text" class="input-certName" placeholder="例: 基本情報技術者試験">
                 </div>
-                <div class="form-group">
-                    <label>取得年月 (Date)</label>
+                <div class="cert-field">
+                    <label>取得年月</label>
                     <input type="text" class="input-certDate" placeholder="YYYY/MM">
                 </div>
-                <div class="form-group full-width">
-                    <label>発行機関 (Issuer)</label>
+                <div class="cert-field cert-field-full">
+                    <label>発行機関</label>
                     <input type="text" class="input-certIssuer" placeholder="例: IPA（情報処理推進機構）">
                 </div>
             </div>
