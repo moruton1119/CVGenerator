@@ -534,137 +534,56 @@ function loadData() {
 function restoreData(data) {
     if (!data) return;
 
-    // Normalize legacy data
-    const normalized = normalizeData(data);
-
     // Personal
-    if (normalized.personal) {
-        setValue('fullName', normalized.personal.fullName);
-        setValue('jobTitle', normalized.personal.jobTitle);
-        setValue('email', normalized.personal.email);
-        setValue('phone', normalized.personal.phone);
-        setValue('location', normalized.personal.location);
-        setValue('website', normalized.personal.website);
+    if (data.personal) {
+        setValue('fullName', data.personal.fullName);
+        setValue('jobTitle', data.personal.jobTitle);
+        setValue('email', data.personal.email);
+        setValue('phone', data.personal.phone);
+        setValue('location', data.personal.location);
+        setValue('website', data.personal.website);
     }
 
     // Summary
-    setValue('summary', normalized.summary);
+    setValue('summary', data.summary);
 
     // Skills (structured)
-    if (normalized.skills) {
-        if (Array.isArray(normalized.skills)) {
-            // Legacy: all skills in "other"
-            skillsData = { languages: [], frameworks: [], tools: [], cloud: [], other: [...normalized.skills] };
-        } else if (typeof normalized.skills === 'string') {
-            // Legacy: comma-separated string
-            const arr = normalized.skills.split(/[,\n]/).map(s => s.trim()).filter(s => s);
-            skillsData = { languages: [], frameworks: [], tools: [], cloud: [], other: arr };
-        } else {
-            // New structured format
-            skillsData = {
-                languages: normalized.skills.languages || [],
-                frameworks: normalized.skills.frameworks || [],
-                tools: normalized.skills.tools || [],
-                cloud: normalized.skills.cloud || [],
-                other: normalized.skills.other || []
-            };
-        }
+    if (data.skills) {
+        skillsData = {
+            languages: data.skills.languages || [],
+            frameworks: data.skills.frameworks || [],
+            tools: data.skills.tools || [],
+            cloud: data.skills.cloud || [],
+            other: data.skills.other || []
+        };
         renderAllSkillTags();
     }
 
     // Experience
     const expList = document.getElementById('experience-list');
     expList.innerHTML = '';
-    if (normalized.experience && Array.isArray(normalized.experience)) {
-        normalized.experience.forEach(item => addExperience(item));
+    if (data.experience && Array.isArray(data.experience)) {
+        data.experience.forEach(item => addExperience(item));
     }
 
     // Education
     const eduList = document.getElementById('education-list');
     eduList.innerHTML = '';
-    if (normalized.education && Array.isArray(normalized.education)) {
-        normalized.education.forEach(item => addEducation(item));
+    if (data.education && Array.isArray(data.education)) {
+        data.education.forEach(item => addEducation(item));
     }
 
     // Certifications
     const certList = document.getElementById('certification-list');
     certList.innerHTML = '';
-    if (normalized.certifications && Array.isArray(normalized.certifications)) {
-        normalized.certifications.forEach(item => addCertification(item));
+    if (data.certifications && Array.isArray(data.certifications)) {
+        data.certifications.forEach(item => addCertification(item));
     }
 
     // Trigger resize for all textareas
     setTimeout(() => {
         document.querySelectorAll('textarea').forEach(el => autoResize(el));
     }, 0);
-}
-
-/**
- * Normalizes input data - handles legacy formats
- */
-function normalizeData(data) {
-    // Japanese legacy format
-    if (data["個人情報"] || data["職務経歴"]) {
-        const p = data["個人情報"] || {};
-        const skillsObj = data["スキル一覧"] || {};
-
-        let skillsStr = "";
-        if (typeof skillsObj === 'object') {
-            skillsStr = Object.entries(skillsObj)
-                .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
-                .join('\n');
-        }
-
-        const experience = (data["職務経歴"] || []).map(item => {
-            const period = item["期間"] || {};
-            let desc = item["担当業務"] || "";
-            if (item["主要プロジェクト"] && Array.isArray(item["主要プロジェクト"])) {
-                desc += "\n\n【主要プロジェクト】\n" + item["主要プロジェクト"].map(p =>
-                    `・${p["プロジェクト名"]}: ${p["概要"]}`
-                ).join('\n');
-            }
-            if (item["業務工程"] && Array.isArray(item["業務工程"])) {
-                desc += "\n\n【担当工程】: " + item["業務工程"].join(', ');
-            }
-
-            return {
-                company: item["企業名"] || "",
-                position: item["職種"] || "",
-                status: '',
-                startDate: period["開始年月"] || "",
-                endDate: period["終了年月"] || "",
-                description: desc.trim(),
-                techTags: []
-            };
-        });
-
-        return {
-            personal: {
-                fullName: p["氏名"] || "",
-                jobTitle: "",
-                email: p["メールアドレス"] || "",
-                phone: p["電話番号"] || "",
-                location: p["住所"] || "",
-                website: ""
-            },
-            summary: (data["自己PR"] || "") + (data["志望動機"] ? "\n\n【志望動機】\n" + data["志望動機"] : ""),
-            skills: { languages: [], frameworks: [], tools: [], cloud: [], other: skillsStr.split(/[,\n]/).map(s => s.trim()).filter(s => s) },
-            experience: experience,
-            education: data["学歴"] || [],
-            certifications: []
-        };
-    }
-
-    // Ensure all fields exist
-    if (!data.skills) data.skills = { languages: [], frameworks: [], tools: [], cloud: [], other: [] };
-    if (!data.certifications) data.certifications = [];
-    if (data.experience) {
-        data.experience.forEach(exp => {
-            if (!exp.techTags) exp.techTags = [];
-        });
-    }
-
-    return data;
 }
 
 // ==================== HELPER FUNCTIONS ====================
@@ -682,22 +601,6 @@ function setValue(id, val) {
 function getVal(parent, selector) {
     const el = parent.querySelector(selector);
     return el ? el.value : '';
-}
-
-function getDynamicList(containerId, selectors) {
-    const container = document.getElementById(containerId);
-    const items = [];
-    if (!container) return items;
-    container.querySelectorAll('.item-card').forEach(card => {
-        const itemObj = {};
-        selectors.forEach(sel => {
-            const input = card.querySelector(sel);
-            const key = sel.replace('.input-', '');
-            itemObj[key] = input ? input.value : '';
-        });
-        items.push(itemObj);
-    });
-    return items;
 }
 
 // ==================== DYNAMIC LIST: EXPERIENCE ====================
@@ -811,9 +714,8 @@ function loadJSON(event) {
     reader.onload = function (e) {
         try {
             const data = JSON.parse(e.target.result);
-            const normalized = normalizeData(data);
-            if (normalized.skills) {
-                skillsData = normalized.skills;
+            if (data.skills) {
+                skillsData = data.skills;
                 renderAllSkillTags();
             }
             restoreData(data);
