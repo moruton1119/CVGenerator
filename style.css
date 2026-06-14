@@ -319,6 +319,11 @@ body {
     grid-column: 1 / -1;
 }
 
+#summary {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 .edit-field label {
     font-size: 0.8rem;
     font-weight: 600;
@@ -381,8 +386,14 @@ textarea:focus {
 
 textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 120px;
     line-height: 1.6;
+}
+
+#summary {
+    min-height: 200px;
+    font-size: 0.95rem;
+    line-height: 1.7;
 }
 
 .char-count {

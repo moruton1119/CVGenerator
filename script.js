@@ -104,6 +104,10 @@ function bindSummaryCharCount() {
         };
         summary.addEventListener('input', update);
         update();
+        // Also resize on focus and after a delay (for template loads)
+        summary.addEventListener('focus', () => autoResize(summary));
+        setTimeout(() => autoResize(summary), 100);
+        setTimeout(() => autoResize(summary), 500);
     }
 }
 
@@ -470,18 +474,94 @@ function aggregateTechTagsToSkills() {
     renderAllSkillTags();
 }
 
-// Simple skill categorization
+// Comprehensive skill categorization
 function categorizeSkill(name) {
-    const lower = name.toLowerCase();
-    const langList = ['javascript', 'typescript', 'python', 'java', 'c#', 'c++', 'go', 'rust', 'php', 'ruby', 'kotlin', 'swift', 'scala', 'r', 'sql', 'html', 'css', 'c'];
-    const fwList = ['react', 'vue', 'angular', 'svelte', 'next', 'nuxt', 'express', 'spring', 'django', 'flask', 'rails', 'laravel', 'node', 'node.js', 'electron', 'unity', '.net', 'fastapi', 'nest'];
-    const cloudList = ['aws', 'azure', 'gcp', 'docker', 'kubernetes', 'k8s', 'terraform', 'lambda', 'ec2', 's3', 'cloudflare', 'vercel'];
-    const dbList = ['postgresql', 'mysql', 'mongodb', 'redis', 'sqlite', 'dynamodb', 'supabase', 'firebase'];
+    const lower = name.toLowerCase().trim();
 
-    if (langList.some(l => lower === l || lower.includes(l))) return 'languages';
+    // --- プログラミング言語 ---
+    const langList = [
+        'javascript', 'js', 'typescript', 'ts', 'python', 'java', 'c#', 'csharp',
+        'c++', 'cpp', 'c言語', 'go', 'golang', 'rust', 'php', 'ruby', 'perl',
+        'kotlin', 'swift', 'scala', 'r', 'sql', 'html', 'css', 'dart',
+        'objective-c', 'cobol', 'fortran', 'haskell', 'elixir', 'erlang',
+        'lua', 'clojure', 'f#', 'assembly', 'vhdl', 'verilog',
+        'vba', 'powershell', 'bash', 'shell', 'solidity'
+    ];
+
+    // --- フレームワーク・ライブラリ ---
+    const fwList = [
+        'react', 'vue', 'vue.js', 'nuxt', 'nuxt.js', 'angular', 'svelte', 'sveltekit',
+        'next', 'next.js', 'jquery', 'bootstrap', 'tailwind', 'tailwindcss',
+        'express', 'express.js', 'fastify', 'koa', 'nestjs', 'nest.js',
+        'spring', 'spring boot', 'springboot', 'django', 'flask', 'fastapi',
+        'rails', 'ruby on rails', 'laravel', 'codeigniter', 'symfony',
+        'node', 'node.js', 'deno', 'bun',
+        'electron', 'unity', 'unreal', 'godot',
+        '.net', '.net core', 'asp.net', 'xamarin', 'maui',
+        'flutter', 'react native', 'ionic', 'cordova', 'phonegap',
+        'qt', 'wpf', 'winforms', 'wxwidgets',
+        'redux', 'mobx', 'recoil', 'zustand', 'pinia', 'vuex',
+        'three.js', 'threejs', 'd3.js', 'chart.js', 'pixi.js',
+        'storybook', 'material-ui', 'mui', 'chakra ui', 'antd',
+        'prisma', 'typeorm', 'sequelize', 'mongoose',
+        'gin', 'echo', 'fiber'
+    ];
+
+    // --- クラウド・インフラ ---
+    const cloudList = [
+        'aws', 'amazon web services', 'azure', 'microsoft azure', 'gcp', 'google cloud',
+        'docker', 'kubernetes', 'k8s', 'containerd', 'podman',
+        'terraform', 'ansible', 'cloudformation', 'pulumi',
+        'lambda', 'ec2', 's3', 'rds', 'dynamodb', 'ecs', 'eks', 'fargate',
+        'cloudfront', 'route53', 'cloudwatch', 'iam', 'api gateway',
+        'cloudflare', 'vercel', 'netlify', 'heroku', 'digitalocean',
+        'nginx', 'apache', 'caddy', 'traefik',
+        'ci/cd', 'github actions', 'gitlab ci', 'jenkins', 'circleci', 'travis ci',
+        'argocd', 'helm', 'istio', 'minikube', 'kind',
+        'serverless', 'sam', 'amplify', 'appsync',
+        'firebase', 'supabase', 'planetscale', 'render'
+    ];
+
+    // --- データベース（toolsに入れる） ---
+    const dbList = [
+        'postgresql', 'postgres', 'mysql', 'mariadb', 'mongodb', 'mongo',
+        'redis', 'memcached', 'sqlite', 'oracle', 'sqlserver', 'sql server',
+        'dynamodb', 'cassandra', 'elasticsearch', 'neo4j', 'influxdb',
+        'supabase', 'firebase', 'firestore', 'prisma', 'typeorm'
+    ];
+
+    // --- ツール・ミドルウェア（toolsに入れる） ---
+    const toolsList = [
+        'git', 'github', 'gitlab', 'bitbucket', 'svn',
+        'playwright', 'puppeteer', 'selenium', 'cypress', 'jest', 'vitest',
+        'webpack', 'vite', 'rollup', 'esbuild', 'babel', 'postcss',
+        'eslint', 'prettier', 'jira', 'confluence', 'trello', 'asana',
+        'figma', 'photoshop', 'illustrator', 'adobe xd', 'sketch', 'gimp',
+        'notion', 'slack', 'discord', 'teams',
+        'n8n', 'zapier', 'make', 'ifttt',
+        'linux', 'ubuntu', 'centos', 'debian', 'alpine',
+        'windows', 'macos', 'android', 'ios',
+        'webrtc', 'agora', 'socket.io', 'websocket',
+        'openai', 'chatgpt', 'langchain', 'llm', 'ai', 'ml',
+        's3', 'grafana', 'prometheus', 'datadog', 'sentry',
+        'yarn', 'npm', 'pnpm', 'composer', 'pip', 'gem',
+        'android studio', 'xcode', 'vscode', 'intellij', 'eclipse'
+    ];
+
+    // 完全一致を優先
+    if (langList.some(l => lower === l)) return 'languages';
+    if (fwList.some(f => lower === f)) return 'frameworks';
+    if (cloudList.some(c => lower === c)) return 'cloud';
+    if (dbList.some(d => lower === d)) return 'tools';
+    if (toolsList.some(t => lower === t)) return 'tools';
+
+    // 部分一致
+    if (langList.some(l => lower.includes(l))) return 'languages';
     if (fwList.some(f => lower.includes(f))) return 'frameworks';
-    if (cloudList.some(c => lower.includes(c))) return 'cloud';
     if (dbList.some(d => lower.includes(d))) return 'tools';
+    if (cloudList.some(c => lower.includes(c))) return 'cloud';
+    if (toolsList.some(t => lower.includes(t))) return 'tools';
+
     return 'other';
 }
 
@@ -893,7 +973,12 @@ function getValue(id) {
 
 function setValue(id, val) {
     const el = document.getElementById(id);
-    if (el) el.value = val || '';
+    if (el) {
+        el.value = val || '';
+        if (el.tagName === 'TEXTAREA') {
+            setTimeout(() => autoResize(el), 50);
+        }
+    }
 }
 
 function getVal(parent, selector) {
@@ -904,7 +989,8 @@ function getVal(parent, selector) {
 function autoResize(el) {
     if (!el) return;
     el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
+    const newHeight = Math.max(el.scrollHeight, 120);
+    el.style.height = newHeight + 'px';
 }
 
 function escHtml(text) {
