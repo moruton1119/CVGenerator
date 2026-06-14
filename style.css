@@ -550,7 +550,7 @@ textarea {
 }
 
 .experience-item .input-company,
-.exucation-item .input-institution,
+.education-item .input-institution,
 .experience-item .input-position,
 .education-item .input-degree,
 .experience-item .input-status,
@@ -794,6 +794,130 @@ textarea {
     opacity: 1;
 }
 
+/* ==================== SKILL LEVEL SYSTEM ==================== */
+.skill-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.7rem;
+    background-color: var(--tag-bg);
+    color: var(--tag-text);
+    border: 1px solid var(--tag-border);
+    border-radius: 99px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.15s;
+    cursor: pointer;
+    position: relative;
+}
+
+.skill-tag:hover {
+    background-color: #e0e7ff;
+    border-color: #a5b4fc;
+}
+
+.skill-tag .skill-name {
+    font-weight: 600;
+}
+
+.skill-tag .skill-stars {
+    color: #f59e0b;
+    font-size: 0.75rem;
+    letter-spacing: -1px;
+}
+
+.skill-tag .skill-years {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    font-weight: 400;
+}
+
+.skill-tag .tag-remove {
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+    user-select: none;
+}
+
+.skill-tag .tag-remove:hover {
+    opacity: 1;
+    color: var(--danger-color);
+}
+
+.skill-tag.from-experience {
+    border-color: #86efac;
+    background-color: #f0fdf4;
+    color: #166534;
+}
+
+.skill-tag.from-experience .skill-stars {
+    color: #16a34a;
+}
+
+.from-exp-badge {
+    display: inline-block;
+    background-color: #dcfce7;
+    color: #16a34a;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.1rem 0.3rem;
+    border-radius: 4px;
+    line-height: 1.2;
+}
+
+/* Skill level editor popover */
+.skill-editor-popover {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    padding: 0.75rem;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 200px;
+}
+
+.skill-editor-popover label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.skill-editor-popover select,
+.skill-editor-popover input {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.skill-level-stars-input {
+    display: flex;
+    gap: 0.2rem;
+}
+
+.skill-level-stars-input .star-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #d1d5db;
+    padding: 0;
+    transition: color 0.15s;
+}
+
+.skill-level-stars-input .star-btn.active {
+    color: #f59e0b;
+}
+
 /* ==================== PREVIEW ==================== */
 #preview-content {
     background-color: var(--surface-color);
@@ -801,6 +925,55 @@ textarea {
     box-shadow: var(--shadow-lg);
     padding: 3rem;
     min-height: 600px;
+}
+
+/* A4 Preview */
+.preview-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.preview-toolbar-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.preview-toolbar-info select {
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    background: white;
+}
+
+.a4-preview-wrapper {
+    background: #e2e8f0;
+    padding: 2rem;
+    border-radius: var(--radius);
+    overflow: auto;
+}
+
+.a4-page {
+    background: white;
+    width: 210mm;
+    min-height: 297mm;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 15mm 18mm;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    box-sizing: border-box;
+}
+
+.a4-page .preview-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
 }
 
 .preview-header {
@@ -936,6 +1109,28 @@ textarea {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.5rem;
+}
+
+.preview-skill-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.3rem;
+    font-size: 0.82rem;
+}
+
+.preview-skill-item .skill-name {
+    font-weight: 500;
+}
+
+.preview-skill-item .skill-stars {
+    color: #f59e0b;
+    font-size: 0.75rem;
+}
+
+.preview-skill-item .skill-years {
+    color: var(--text-light);
+    font-size: 0.7rem;
 }
 
 .preview-edu-degree {
@@ -1095,6 +1290,15 @@ textarea {
     .preview-contact {
         flex-direction: column;
         gap: 0.5rem;
+    }
+
+    .a4-preview-wrapper {
+        padding: 1rem;
+    }
+
+    .a4-page {
+        width: 100%;
+        padding: 10mm;
     }
 
     #preview-content {

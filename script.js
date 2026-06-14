@@ -13,6 +13,18 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==================== CONSTANTS ====================
 const STORAGE_KEY = 'resume_helper_data';
 let skillsData = { languages: [], frameworks: [], tools: [], cloud: [], other: [] };
+let activeTemplate = 'standard';
+
+// Backward compatibility: convert string arrays to objects
+function migrateSkillItems(arr) {
+    if (!Array.isArray(arr)) return [];
+    return arr.map(item => {
+        if (typeof item === 'string') {
+            return { name: item, level: 3, years: '', fromExp: false };
+        }
+        return { name: item.name || '', level: item.level || 3, years: item.years || '', fromExp: item.fromExp || false };
+    });
+}
 
 // ==================== INPUT BINDING ====================
 function bindStaticInputs() {
@@ -41,6 +53,18 @@ function bindButtons() {
     });
     document.getElementById('sidebar-toggle').addEventListener('click', toggleSidebar);
     document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
+
+    // Preview controls
+    const previewTpl = document.getElementById('preview-template-select');
+    const previewSort = document.getElementById('preview-sort-select');
+    if (previewTpl) previewTpl.addEventListener('change', () => renderPreview());
+    if (previewSort) previewSort.addEventListener('change', () => renderPreview());
+
+    const btnSavePdf = document.getElementById('btn-save-pdf');
+    if (btnSavePdf) btnSavePdf.addEventListener('click', () => {
+        switchPage('preview');
+        setTimeout(() => window.print(), 400);
+    });
 }
 
 function bindSidebar() {
@@ -180,7 +204,13 @@ function loadTemplate(key) {
             personal: { fullName: '', fullNameKana: '', jobTitle: 'ソフトウェアエンジニア', email: '', phone: '', location: '', website: '' },
             summary: '〇年間のWebアプリケーション開発経験を持ち、バックエンドからフロントエンドまで幅広い技術スタックを扱ってきました。アジャイル開発チームでの開発プロセス改善や、パフォーマンス最適化の実績があります。',
             experience: [{ company: '', position: 'ソフトウェアエンジニア', status: '正社員', startDate: '', endDate: '', description: '・Webアプリケーションの設計・開発・運用\n・アジャイルチームでのスクラム開発\n・API設計とデータベース最適化', techTags: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'AWS'] }],
-            skills: { languages: ['JavaScript', 'TypeScript', 'Python', 'Java'], frameworks: ['React', 'Vue.js', 'Express', 'Spring Boot'], tools: ['Git', 'Docker', 'Jest'], cloud: ['AWS', 'Docker'], other: ['アジャイル/スクラム'] },
+            skills: {
+                languages: [{name:'JavaScript',level:4,years:'3年'},{name:'TypeScript',level:4,years:'2年'},{name:'Python',level:3,years:'2年'},{name:'Java',level:3,years:'3年'}],
+                frameworks: [{name:'React',level:4,years:'2年'},{name:'Vue.js',level:3,years:'1年'},{name:'Express',level:3,years:'2年'},{name:'Spring Boot',level:3,years:'1年'}],
+                tools: [{name:'Git',level:4,years:'3年'},{name:'Docker',level:3,years:'2年'},{name:'Jest',level:3,years:'1年'}],
+                cloud: [{name:'AWS',level:4,years:'2年'}],
+                other: [{name:'アジャイル/スクラム',level:3,years:'2年'}]
+            },
             certifications: [],
             education: []
         },
@@ -188,7 +218,13 @@ function loadTemplate(key) {
             personal: { fullName: '', fullNameKana: '', jobTitle: 'UI/UXデザイナー', email: '', phone: '', location: '', website: '' },
             summary: 'ユーザー中心のデザインプロセスに精通し、Web・モバイルアプリケーションのUI/UXデザインを担当。ユーザーリサーチからプロトタイピング、デザインシステムの構築まで一貫して手がけています。',
             experience: [{ company: '', position: 'UI/UXデザイナー', status: '正社員', startDate: '', endDate: '', description: '・Web・アプリのUI/UXデザイン\n・デザインシステムの構築・運用\n・ユーザーテストと改善施策の実施', techTags: ['Figma', 'Adobe XD', 'Photoshop'] }],
-            skills: { languages: ['HTML', 'CSS'], frameworks: ['Figma', 'Adobe CC'], tools: ['Miro', 'Notion'], cloud: [], other: ['ユーザーリサーチ', 'プロトタイピング'] },
+            skills: {
+                languages: [{name:'HTML',level:4,years:'3年'},{name:'CSS',level:4,years:'3年'}],
+                frameworks: [{name:'Figma',level:5,years:'3年'},{name:'Adobe CC',level:4,years:'3年'}],
+                tools: [{name:'Miro',level:3,years:'1年'},{name:'Notion',level:3,years:'1年'}],
+                cloud: [],
+                other: [{name:'ユーザーリサーチ',level:4,years:'2年'},{name:'プロトタイピング',level:4,years:'2年'}]
+            },
             certifications: [],
             education: []
         },
@@ -196,7 +232,13 @@ function loadTemplate(key) {
             personal: { fullName: '', fullNameKana: '', jobTitle: 'プロジェクトマネージャー', email: '', phone: '', location: '', website: '' },
             summary: '〇年のプロジェクトマネジメント経験。大規模システム開発プロジェクトの計画・進行管理から、ステークホルダー調整、チームビルディングまで幅広く対応。PMP資格保有。',
             experience: [{ company: '', position: 'プロジェクトマネージャー', status: '正社員', startDate: '', endDate: '', description: '・プロジェクト計画策定と進行管理\n・要件定義・基本設計のリード\n・品質管理・リスク管理', techTags: ['Jira', 'Confluence', 'MS Project'] }],
-            skills: { languages: [], frameworks: [], tools: ['Jira', 'Confluence', 'MS Project'], cloud: [], other: ['プロジェクト管理', 'アジャイル/スクラム', '要件定義', 'リスク管理'] },
+            skills: {
+                languages: [],
+                frameworks: [],
+                tools: [{name:'Jira',level:4,years:'3年'},{name:'Confluence',level:4,years:'3年'},{name:'MS Project',level:3,years:'2年'}],
+                cloud: [],
+                other: [{name:'プロジェクト管理',level:5,years:'5年'},{name:'アジャイル/スクラム',level:4,years:'3年'},{name:'要件定義',level:4,years:'4年'},{name:'リスク管理',level:4,years:'3年'}]
+            },
             certifications: [{ name: 'PMP (Project Management Professional)', date: '', issuer: 'PMI' }],
             education: []
         },
@@ -221,13 +263,21 @@ function loadTemplate(key) {
     }
 }
 
-// ==================== SKILL TAGS ====================
+// ==================== SKILL TAGS (with level system) ====================
+const SKILL_LEVELS = {
+    1: { label: '★1 初心者', stars: '★☆☆☆☆' },
+    2: { label: '★2 経験者', stars: '★★☆☆☆' },
+    3: { label: '★3 中級', stars: '★★★☆☆' },
+    4: { label: '★4 上級', stars: '★★★★☆' },
+    5: { label: '★5 エキスパート', stars: '★★★★★' }
+};
+
 function addSkillTag(category, value) {
     if (!skillsData[category]) skillsData[category] = [];
-    if (!skillsData[category].includes(value)) {
-        skillsData[category].push(value);
-        renderSkillTags(category);
-    }
+    // Check if already exists
+    if (skillsData[category].some(s => s.name === value)) return;
+    skillsData[category].push({ name: value, level: 3, years: '', fromExp: false });
+    renderSkillTags(category);
 }
 
 function removeSkillTag(category, index) {
@@ -237,23 +287,117 @@ function removeSkillTag(category, index) {
     updateProgress();
 }
 
+function setSkillLevel(category, index, level) {
+    if (skillsData[category] && skillsData[category][index]) {
+        skillsData[category][index].level = level;
+        renderSkillTags(category);
+        saveData();
+    }
+}
+
+function setSkillYears(category, index, years) {
+    if (skillsData[category] && skillsData[category][index]) {
+        skillsData[category][index].years = years;
+        saveData();
+    }
+}
+
 function renderSkillTags(category) {
     const container = document.querySelector(`.tags-display[data-skill-category="${category}"]`);
     if (!container) return;
     container.innerHTML = '';
-    (skillsData[category] || []).forEach((tag, i) => {
+    (skillsData[category] || []).forEach((skill, i) => {
         const el = document.createElement('span');
-        el.className = 'tag';
-        el.innerHTML = `${escHtml(tag)} <span class="tag-remove" onclick="removeSkillTag('${category}', ${i})">&times;</span>`;
+        el.className = 'skill-tag' + (skill.fromExp ? ' from-experience' : '');
+
+        const levelInfo = SKILL_LEVELS[skill.level] || SKILL_LEVELS[3];
+        let innerHTML = `<span class="skill-name">${escHtml(skill.name)}</span>`;
+        innerHTML += `<span class="skill-stars">${levelInfo.stars}</span>`;
+        if (skill.years) innerHTML += `<span class="skill-years">${escHtml(skill.years)}</span>`;
+        if (skill.fromExp) innerHTML += `<span class="from-exp-badge">経歴</span>`;
+        innerHTML += ` <span class="tag-remove" onclick="removeSkillTag('${category}', ${i})">&times;</span>`;
+        el.innerHTML = innerHTML;
+
+        // Click to edit level/years
+        el.addEventListener('click', e => {
+            if (e.target.classList.contains('tag-remove')) return;
+            showSkillEditor(el, category, i);
+        });
+
         container.appendChild(el);
     });
+}
+
+function showSkillEditor(tagEl, category, index) {
+    // Remove any existing editor
+    document.querySelectorAll('.skill-editor-popover').forEach(e => e.remove());
+
+    const skill = skillsData[category][index];
+    const editor = document.createElement('div');
+    editor.className = 'skill-editor-popover';
+
+    // Stars
+    const starsDiv = document.createElement('div');
+    starsDiv.innerHTML = '<label>レベル</label>';
+    const starsRow = document.createElement('div');
+    starsRow.className = 'skill-level-stars-input';
+    for (let lv = 1; lv <= 5; lv++) {
+        const btn = document.createElement('button');
+        btn.className = 'star-btn' + (lv <= skill.level ? ' active' : '');
+        btn.textContent = '★';
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            skillsData[category][index].level = lv;
+            saveData();
+            renderSkillTags(category);
+            editor.remove();
+        };
+        starsRow.appendChild(btn);
+    }
+    starsDiv.appendChild(starsRow);
+    editor.appendChild(starsDiv);
+
+    // Years
+    const yearsDiv = document.createElement('div');
+    yearsDiv.innerHTML = '<label>経験年数</label>';
+    const yearsInput = document.createElement('input');
+    yearsInput.type = 'text';
+    yearsInput.value = skill.years || '';
+    yearsInput.placeholder = '例: 3年';
+    yearsInput.onclick = e => e.stopPropagation();
+    yearsInput.addEventListener('input', () => {
+        skillsData[category][index].years = yearsInput.value;
+        saveData();
+    });
+    yearsDiv.appendChild(yearsInput);
+    editor.appendChild(yearsDiv);
+
+    // Close button
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'btn small';
+    closeBtn.textContent = '閉じる';
+    closeBtn.onclick = e => { e.stopPropagation(); editor.remove(); };
+    editor.appendChild(closeBtn);
+
+    tagEl.style.position = 'relative';
+    tagEl.appendChild(editor);
+
+    // Close on outside click
+    setTimeout(() => {
+        document.addEventListener('click', function closeEditor(e) {
+            if (!editor.contains(e.target) && e.target !== tagEl) {
+                editor.remove();
+                document.removeEventListener('click', closeEditor);
+            }
+        });
+    }, 0);
 }
 
 function renderAllSkillTags() {
     ['languages', 'frameworks', 'tools', 'cloud', 'other'].forEach(c => renderSkillTags(c));
 }
 
-// ==================== TECH TAGS (experience items) ====================
+// ==================== TECH TAGS (experience items) + AGGREGATION ====================
 function addTechTagToItem(input) {
     const val = input.value.trim();
     if (!val) return;
@@ -263,6 +407,7 @@ function addTechTagToItem(input) {
         card._techTags.push(val);
         renderTechTagsForCard(card);
         input.value = '';
+        aggregateTechTagsToSkills();
         saveData();
     }
 }
@@ -284,7 +429,60 @@ function removeTechTagFromItem(span, index) {
     const card = span.closest('.item-card');
     card._techTags.splice(index, 1);
     renderTechTagsForCard(card);
+    aggregateTechTagsToSkills();
     saveData();
+}
+
+// Aggregate tech tags from all experience items into skills
+function aggregateTechTagsToSkills() {
+    // Collect all tech tags from experience items
+    const allTechTags = new Set();
+    document.querySelectorAll('#experience-list .item-card').forEach(card => {
+        (card._techTags || []).forEach(tag => allTechTags.add(tag));
+    });
+
+    // Mark existing skills that come from experience
+    Object.keys(skillsData).forEach(cat => {
+        skillsData[cat].forEach(skill => {
+            if (allTechTags.has(skill.name)) {
+                skill.fromExp = true;
+            } else if (skill.fromExp) {
+                // Was from experience but tech tag was removed
+                // Keep the skill but mark as not from experience
+                skill.fromExp = false;
+            }
+        });
+    });
+
+    // Auto-add new tech tags to 'other' or try to match existing categories
+    const knownSkills = new Set();
+    Object.values(skillsData).forEach(arr => arr.forEach(s => knownSkills.add(s.name)));
+
+    allTechTags.forEach(tag => {
+        if (!knownSkills.has(tag)) {
+            // Try to categorize
+            const cat = categorizeSkill(tag);
+            skillsData[cat].push({ name: tag, level: 3, years: '', fromExp: true });
+            knownSkills.add(tag);
+        }
+    });
+
+    renderAllSkillTags();
+}
+
+// Simple skill categorization
+function categorizeSkill(name) {
+    const lower = name.toLowerCase();
+    const langList = ['javascript', 'typescript', 'python', 'java', 'c#', 'c++', 'go', 'rust', 'php', 'ruby', 'kotlin', 'swift', 'scala', 'r', 'sql', 'html', 'css', 'c'];
+    const fwList = ['react', 'vue', 'angular', 'svelte', 'next', 'nuxt', 'express', 'spring', 'django', 'flask', 'rails', 'laravel', 'node', 'node.js', 'electron', 'unity', '.net', 'fastapi', 'nest'];
+    const cloudList = ['aws', 'azure', 'gcp', 'docker', 'kubernetes', 'k8s', 'terraform', 'lambda', 'ec2', 's3', 'cloudflare', 'vercel'];
+    const dbList = ['postgresql', 'mysql', 'mongodb', 'redis', 'sqlite', 'dynamodb', 'supabase', 'firebase'];
+
+    if (langList.some(l => lower === l || lower.includes(l))) return 'languages';
+    if (fwList.some(f => lower.includes(f))) return 'frameworks';
+    if (cloudList.some(c => lower.includes(c))) return 'cloud';
+    if (dbList.some(d => lower.includes(d))) return 'tools';
+    return 'other';
 }
 
 // ==================== DATA: GET / SAVE / LOAD ====================
@@ -383,11 +581,11 @@ function restoreData(data) {
 
     // Skills
     skillsData = {
-        languages: data.skills.languages || [],
-        frameworks: data.skills.frameworks || [],
-        tools: data.skills.tools || [],
-        cloud: data.skills.cloud || [],
-        other: data.skills.other || []
+        languages: migrateSkillItems(data.skills.languages),
+        frameworks: migrateSkillItems(data.skills.frameworks),
+        tools: migrateSkillItems(data.skills.tools),
+        cloud: migrateSkillItems(data.skills.cloud),
+        other: migrateSkillItems(data.skills.other)
     };
     renderAllSkillTags();
 
@@ -395,6 +593,9 @@ function restoreData(data) {
     const expList = document.getElementById('experience-list');
     expList.innerHTML = '';
     (data.experience || []).forEach(item => addExperience(item));
+
+    // Aggregate tech tags after experience is loaded
+    aggregateTechTagsToSkills();
 
     // Education
     const eduList = document.getElementById('education-list');
@@ -420,30 +621,73 @@ function restoreData(data) {
 function renderPreview() {
     const data = getCurrentData();
     const container = document.getElementById('preview-content');
-    let html = '';
 
-    // Header
-    html += '<div class="preview-header">';
-    html += `<h1>${escHtml(data.personal.fullName || '氏名未入力')}</h1>`;
-    if (data.personal.jobTitle) html += `<div class="preview-jobtitle">${escHtml(data.personal.jobTitle)}</div>`;
-    html += '<div class="preview-contact">';
-    if (data.personal.email) html += `<span>📧 ${escHtml(data.personal.email)}</span>`;
-    if (data.personal.phone) html += `<span>📱 ${escHtml(data.personal.phone)}</span>`;
-    if (data.personal.location) html += `<span>📍 ${escHtml(data.personal.location)}</span>`;
-    if (data.personal.website) html += `<span>🔗 ${escHtml(data.personal.website)}</span>`;
-    html += '</div></div>';
+    // Get template and sort order
+    const tplSelect = document.getElementById('preview-template-select');
+    const sortSelect = document.getElementById('preview-sort-select');
+    if (tplSelect) activeTemplate = tplSelect.value;
+    const sortOrder = sortSelect ? sortSelect.value : 'new';
 
-    // Summary
-    if (data.summary) {
-        html += '<div class="preview-section"><h3 class="preview-section-title">自己PR</h3>';
-        html += `<div class="preview-summary">${escHtml(data.summary)}</div></div>`;
+    // Sort experience
+    let sortedExp = [...data.experience];
+    if (sortOrder === 'new') {
+        sortedExp.sort((a, b) => (b.startDate || '').localeCompare(a.startDate || ''));
+    } else {
+        sortedExp.sort((a, b) => (a.startDate || '').localeCompare(b.startDate || ''));
     }
 
-    // Experience
-    if (data.experience.length > 0) {
-        html += '<div class="preview-section"><h3 class="preview-section-title">職務経歴</h3>';
+    let sections = [];
+
+    // Build each section as a function
+    const buildHeader = () => {
+        let html = '<div class="preview-header">';
+        html += `<h1>${escHtml(data.personal.fullName || '氏名未入力')}</h1>`;
+        if (data.personal.fullNameKana) html += `<div style="font-size:0.85rem;color:var(--text-light);margin-bottom:0.3rem;">${escHtml(data.personal.fullNameKana)}</div>`;
+        if (data.personal.jobTitle) html += `<div class="preview-jobtitle">${escHtml(data.personal.jobTitle)}</div>`;
+        html += '<div class="preview-contact">';
+        if (data.personal.email) html += `<span>📧 ${escHtml(data.personal.email)}</span>`;
+        if (data.personal.phone) html += `<span>📱 ${escHtml(data.personal.phone)}</span>`;
+        if (data.personal.location) html += `<span>📍 ${escHtml(data.personal.location)}</span>`;
+        if (data.personal.website) html += `<span>🔗 ${escHtml(data.personal.website)}</span>`;
+        html += '</div></div>';
+        return html;
+    };
+
+    const buildSummary = () => {
+        if (!data.summary) return '';
+        return '<div class="preview-section"><h3 class="preview-section-title">自己PR</h3>' +
+               `<div class="preview-summary">${escHtml(data.summary)}</div></div>`;
+    };
+
+    const buildSkills = () => {
+        const hasSkills = Object.values(data.skills).some(arr => arr.length > 0);
+        if (!hasSkills) return '';
+        const labels = { languages: 'プログラミング言語', frameworks: 'フレームワーク・ライブラリ', tools: 'ツール・ミドルウェア', cloud: 'クラウド・インフラ', other: 'その他' };
+        let html = '<div class="preview-section"><h3 class="preview-section-title">スキル</h3>';
+        html += '<div class="preview-skills-grid">';
+        Object.entries(labels).forEach(([key, label]) => {
+            if (data.skills[key] && data.skills[key].length > 0) {
+                html += `<div class="preview-skill-category"><h4>${label}</h4>`;
+                data.skills[key].forEach(skill => {
+                    const levelInfo = SKILL_LEVELS[skill.level] || SKILL_LEVELS[3];
+                    html += '<div class="preview-skill-item">';
+                    html += `<span class="skill-name">${escHtml(skill.name)}</span>`;
+                    html += `<span class="skill-stars">${levelInfo.stars}</span>`;
+                    if (skill.years) html += `<span class="skill-years">${escHtml(skill.years)}</span>`;
+                    html += '</div>';
+                });
+                html += '</div>';
+            }
+        });
+        html += '</div></div>';
+        return html;
+    };
+
+    const buildExperience = () => {
+        if (sortedExp.length === 0) return '';
+        let html = '<div class="preview-section"><h3 class="preview-section-title">職務経歴</h3>';
         html += '<div class="preview-experience-list">';
-        data.experience.forEach(exp => {
+        sortedExp.forEach(exp => {
             html += '<div class="preview-exp-card"><div class="preview-exp-date">';
             html += escHtml(exp.startDate || '');
             if (exp.endDate) html += `<br>〜 ${escHtml(exp.endDate)}`;
@@ -460,27 +704,12 @@ function renderPreview() {
             html += '</div></div>';
         });
         html += '</div></div>';
-    }
+        return html;
+    };
 
-    // Skills
-    const hasSkills = Object.values(data.skills).some(arr => arr.length > 0);
-    if (hasSkills) {
-        const labels = { languages: 'プログラミング言語', frameworks: 'フレームワーク', tools: 'ツール・ミドルウェア', cloud: 'クラウド・インフラ', other: 'その他' };
-        html += '<div class="preview-section"><h3 class="preview-section-title">スキル</h3>';
-        html += '<div class="preview-skills-grid">';
-        Object.entries(labels).forEach(([key, label]) => {
-            if (data.skills[key] && data.skills[key].length > 0) {
-                html += `<div class="preview-skill-category"><h4>${label}</h4><div class="preview-tech-tags">`;
-                data.skills[key].forEach(t => html += `<span class="tag">${escHtml(t)}</span>`);
-                html += '</div></div>';
-            }
-        });
-        html += '</div></div>';
-    }
-
-    // Education
-    if (data.education.length > 0) {
-        html += '<div class="preview-section"><h3 class="preview-section-title">学歴</h3>';
+    const buildEducation = () => {
+        if (data.education.length === 0) return '';
+        let html = '<div class="preview-section"><h3 class="preview-section-title">学歴</h3>';
         html += '<div class="preview-edu-list">';
         data.education.forEach(edu => {
             html += '<div class="preview-edu-card"><div class="preview-edu-date">';
@@ -491,11 +720,12 @@ function renderPreview() {
             html += '</div></div>';
         });
         html += '</div></div>';
-    }
+        return html;
+    };
 
-    // Certifications
-    if (data.certifications.length > 0) {
-        html += '<div class="preview-section"><h3 class="preview-section-title">保有資格</h3>';
+    const buildCerts = () => {
+        if (data.certifications.length === 0) return '';
+        let html = '<div class="preview-section"><h3 class="preview-section-title">保有資格</h3>';
         html += '<div class="preview-cert-list">';
         data.certifications.forEach(cert => {
             html += '<div class="preview-cert-item">';
@@ -506,7 +736,26 @@ function renderPreview() {
             html += '</div></div>';
         });
         html += '</div></div>';
+        return html;
+    };
+
+    // Template-specific section ordering
+    const tpl = activeTemplate || 'standard';
+    if (tpl === 'engineer') {
+        // Skills first, then experience
+        sections = [buildHeader(), buildSummary(), buildSkills(), buildExperience(), buildEducation(), buildCerts()];
+    } else if (tpl === 'designer') {
+        // Summary, Experience, Skills, Certs
+        sections = [buildHeader(), buildSummary(), buildExperience(), buildSkills(), buildEducation(), buildCerts()];
+    } else if (tpl === 'manager') {
+        // Certs prominent, then summary
+        sections = [buildHeader(), buildCerts(), buildSummary(), buildExperience(), buildSkills(), buildEducation()];
+    } else {
+        // Standard: Header → Summary → Experience → Skills → Education → Certs
+        sections = [buildHeader(), buildSummary(), buildExperience(), buildSkills(), buildEducation(), buildCerts()];
     }
+
+    let html = sections.join('');
 
     if (!html.trim()) {
         html = '<div class="preview-empty">まだ入力されたデータがありません。サイドバーから各項目を入力してください。</div>';
@@ -674,3 +923,6 @@ window.removeSkillTag = removeSkillTag;
 window.removeTechTagFromItem = removeTechTagFromItem;
 window.switchPage = switchPage;
 window.saveSectionFeedback = saveSectionFeedback;
+window.setSkillLevel = setSkillLevel;
+window.setSkillYears = setSkillYears;
+window.aggregateTechTagsToSkills = aggregateTechTagsToSkills;

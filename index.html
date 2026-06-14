@@ -213,11 +213,14 @@
             <div class="page-content" id="page-skills">
                 <div class="page-header">
                     <h2>スキルセット</h2>
-                    <p class="page-subtitle">カテゴリ別にスキルをタグ入力します</p>
+                    <p class="page-subtitle">スキルのレベル（★1〜5）と経験年数を設定します。経歴情報で追加した技術は自動でここに集計されます。</p>
                 </div>
 
                 <section class="edit-section">
                     <h3 class="edit-section-title">技術スキル</h3>
+                    <div style="padding: 0.75rem 1.5rem; background: #f0fdf4; border-bottom: 1px solid #e2e8f0; font-size: 0.8rem; color: #166534;">
+                        💡 <strong>経歴連動:</strong> 経歴情報の「使用技術」に入力した技術が、自動的にここに集計されます。<span class="from-exp-badge">経歴から</span>タグ付きのスキルは、元の経歴と紐付いています。
+                    </div>
 
                     <div class="edit-subsection">
                         <h4 class="edit-subsection-title">プログラミング言語 <span class="required-badge">必須</span></h4>
@@ -313,7 +316,26 @@
                     <h2>プレビュー</h2>
                     <p class="page-subtitle">職務経歴書の完成イメージを確認できます</p>
                 </div>
-                <div id="preview-content"></div>
+                <div class="preview-toolbar no-print">
+                    <div class="preview-toolbar-info">
+                        <label>テンプレート:</label>
+                        <select id="preview-template-select">
+                            <option value="standard">ビジネススタンダード</option>
+                            <option value="engineer">エンジニア向け</option>
+                            <option value="designer">デザイナー向け</option>
+                            <option value="manager">PM向け</option>
+                        </select>
+                        <label>並び順:</label>
+                        <select id="preview-sort-select">
+                            <option value="new">時系列（新→旧）</option>
+                            <option value="old">時系列（旧→新）</option>
+                        </select>
+                    </div>
+                    <button class="btn primary" id="btn-save-pdf">📄 PDFを保存</button>
+                </div>
+                <div class="a4-preview-wrapper">
+                    <div class="a4-page" id="preview-content"></div>
+                </div>
             </div>
 
         </main>
