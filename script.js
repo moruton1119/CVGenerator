@@ -67,10 +67,6 @@ function bindButtons() {
     // Dark mode
     document.getElementById('btn-darkmode').addEventListener('click', toggleDarkMode);
 
-    // Photo upload
-    document.getElementById('photo-input').addEventListener('change', handlePhotoUpload);
-    document.getElementById('btn-remove-photo').addEventListener('click', removePhoto);
-
     // URL share
     document.getElementById('btn-share-url').addEventListener('click', generateShareURL);
     document.getElementById('btn-copy-url').addEventListener('click', () => {
@@ -603,8 +599,7 @@ function getCurrentData() {
             email: getValue('email'),
             phone: getValue('phone'),
             location: getValue('location'),
-            website: getValue('website'),
-            photo: photoData || ''
+            website: getValue('website')
         },
         summary: getValue('summary'),
         experience: getExperienceData(),
@@ -694,10 +689,6 @@ function restoreData(data) {
     setValue('location', data.personal.location);
     setValue('website', data.personal.website);
 
-    // Restore photo
-    photoData = data.personal.photo || null;
-    renderPhoto();
-
     // Summary
     setValue('summary', data.summary);
 
@@ -763,10 +754,6 @@ function renderPreview() {
     // Build each section as a function
     const buildHeader = () => {
         let html = '<div class="preview-header">';
-        // Photo
-        if (data.personal.photo) {
-            html += `<img src="${data.personal.photo}" class="preview-photo" alt="" style="float:right;width:80px;height:96px;object-fit:cover;border-radius:8px;margin-left:1rem;">`;
-        }
         html += `<h1>${escHtml(data.personal.fullName || '氏名未入力')}</h1>`;
         if (data.personal.fullNameKana) html += `<div style="font-size:0.85rem;color:var(--text-light);margin-bottom:0.3rem;">${escHtml(data.personal.fullNameKana)}</div>`;
         // Birth date & gender
@@ -784,7 +771,6 @@ function renderPreview() {
         if (data.personal.location) html += `<span>📍 ${escHtml(data.personal.location)}</span>`;
         if (data.personal.website) html += `<span>🔗 ${escHtml(data.personal.website)}</span>`;
         html += '</div></div>';
-        html += '<div style="clear:both;"></div>';
         return html;
     };
 
@@ -1118,8 +1104,6 @@ function clearData() {
     }
 }
 
-let photoData = null;
-
 // ==================== PHOTO UPLOAD ====================
 function handlePhotoUpload(event) {
     const file = event.target.files[0];
@@ -1189,9 +1173,7 @@ function duplicateExperience(btn) {
 function generateShareURL() {
     saveData();
     const data = getCurrentData();
-    // Strip photo data (too large for URL)
     const dataCopy = JSON.parse(JSON.stringify(data));
-    if (dataCopy.personal) delete dataCopy.personal.photo;
     const json = JSON.stringify(dataCopy);
     // Compress with btoa (base64 encode UTF-8)
     const encoded = btoa(unescape(encodeURIComponent(json)));
