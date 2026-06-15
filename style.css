@@ -59,7 +59,6 @@ body.dark-mode {
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4);
 }
-}
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1509,18 +1508,34 @@ select {
     .header-inner {
         padding-left: calc(var(--sidebar-width) + 1rem);
     }
+    .actions {
+        gap: 0.35rem;
+    }
+    .actions .btn {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.6rem;
+    }
 }
 
 @media (max-width: 768px) {
     .header-inner {
         flex-wrap: wrap;
-        gap: 0.75rem;
-        padding: 0.75rem 1rem;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
     }
 
     .main-content {
         padding: 1rem;
         margin-left: 0;
+    }
+
+    .header-left {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .app-logo {
+        font-size: 1.1rem;
     }
 
     .sidebar-toggle {
@@ -1531,16 +1546,36 @@ select {
         order: 3;
         max-width: 100%;
         width: 100%;
+        gap: 0.5rem;
+    }
+
+    .progress-bar {
+        height: 6px;
+    }
+
+    .progress-text {
+        font-size: 0.7rem;
     }
 
     .actions {
         flex-wrap: wrap;
-        gap: 0.4rem;
+        gap: 0.3rem;
+        order: 2;
     }
 
-    .actions .btn {
-        font-size: 0.75rem;
-        padding: 0.45rem 0.7rem;
+    .actions .btn,
+    .actions .template-dropdown {
+        font-size: 0.7rem;
+        padding: 0.35rem 0.55rem;
+    }
+
+    /* Hide text labels on small screens, show icons only */
+    .actions .btn.secondary {
+        font-size: 0;
+        padding: 0.4rem 0.5rem;
+    }
+    .actions .btn.secondary::first-letter {
+        font-size: 1rem;
     }
 
     .sidebar {
@@ -1632,7 +1667,34 @@ select {
 @media (max-width: 480px) {
     body { font-size: 13px; }
 
-    .app-logo { font-size: 1.15rem; }
+    .app-logo { font-size: 1rem; }
+
+    .header-inner {
+        padding: 0.4rem 0.5rem;
+        gap: 0.3rem;
+    }
+
+    .header-left {
+        gap: 0.4rem;
+    }
+
+    .sidebar-toggle {
+        font-size: 1.25rem;
+    }
+
+    .progress-wrapper {
+        gap: 0.4rem;
+    }
+
+    .actions {
+        gap: 0.2rem;
+    }
+
+    .actions .btn,
+    .actions .template-dropdown {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.45rem;
+    }
 
     .edit-section-title {
         font-size: 1rem;
