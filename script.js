@@ -586,8 +586,14 @@ function getCurrentData() {
 }
 
 function getExperienceData() {
+    const PROCESS_KEYS = ['proc-requirements', 'proc-basic-design', 'proc-detailed-design', 'proc-implementation', 'proc-unit-test', 'proc-integration-test', 'proc-maintenance'];
     const items = [];
     document.querySelectorAll('#experience-list .item-card').forEach(card => {
+        const processes = [];
+        PROCESS_KEYS.forEach(cls => {
+            const cb = card.querySelector('.' + cls);
+            if (cb && cb.checked) processes.push(cb.value);
+        });
         items.push({
             company: getVal(card, '.input-company'),
             position: getVal(card, '.input-position'),
@@ -595,6 +601,7 @@ function getExperienceData() {
             startDate: getVal(card, '.input-startDate'),
             endDate: getVal(card, '.input-endDate'),
             description: getVal(card, '.input-description'),
+            processes: processes,
             techTags: card._techTags ? [...card._techTags] : []
         });
     });
@@ -775,6 +782,12 @@ function renderPreview() {
             if (exp.company) html += `<div class="preview-exp-company">${escHtml(exp.company)}</div>`;
             if (exp.status) html += `<div class="preview-exp-status">${escHtml(exp.status)}</div>`;
             if (exp.position) html += `<div class="preview-exp-position">${escHtml(exp.position)}</div>`;
+            if (exp.processes && exp.processes.length > 0) {
+                html += '<div class="preview-exp-processes">';
+                html += '<span class="processes-label">担当工程:</span> ';
+                exp.processes.forEach(p => html += `<span class="process-badge">${escHtml(p)}</span>`);
+                html += '</div>';
+            }
             if (exp.description) html += `<div class="preview-exp-description">${escHtml(exp.description)}</div>`;
             if (exp.techTags && exp.techTags.length > 0) {
                 html += '<div class="preview-tech-tags">';
@@ -857,6 +870,22 @@ function addExperience(data = {}) {
     if (data.endDate) card.querySelector('.input-endDate').value = data.endDate;
     if (data.description) card.querySelector('.input-description').value = data.description;
 
+    // Restore process checkboxes
+    const PROCESS_MAP = {
+        'proc-requirements': '要件定義',
+        'proc-basic-design': '基本設計',
+        'proc-detailed-design': '詳細設計',
+        'proc-implementation': '製造',
+        'proc-unit-test': '単体テスト',
+        'proc-integration-test': '結合テスト',
+        'proc-maintenance': '運用'
+    };
+    const processes = data.processes || [];
+    Object.entries(PROCESS_MAP).forEach(([cls, label]) => {
+        const cb = card.querySelector('.' + cls);
+        if (cb && processes.includes(label)) cb.checked = true;
+    });
+
     card._techTags = data.techTags ? [...data.techTags] : [];
 
     const techInput = card.querySelector('.tech-tag-input');
@@ -873,6 +902,9 @@ function addExperience(data = {}) {
 
     const newItem = document.getElementById('experience-list').lastElementChild;
     newItem.querySelectorAll('textarea').forEach(el => autoResize(el));
+
+    // Setup drag and drop for this card
+    setupDragAndDrop(newItem);
 }
 
 function addEducation(data = {}) {
@@ -900,12 +932,16 @@ function addCertification(data = {}) {
 }
 
 function setupDynamicInputs(fragment) {
-    fragment.querySelectorAll('input:not(.tag-input), textarea').forEach(input => {
+    fragment.querySelectorAll('input:not(.tag-input):not([type="checkbox"]), textarea').forEach(input => {
         input.addEventListener('input', () => { saveData(); updateProgress(); });
         if (input.tagName === 'TEXTAREA') {
             input.addEventListener('input', function() { autoResize(this); });
             setTimeout(() => autoResize(input), 0);
         }
+    });
+    // Checkboxes
+    fragment.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', () => { saveData(); updateProgress(); });
     });
 }
 
@@ -915,6 +951,55 @@ function removeParent(btn) {
         saveData();
         updateProgress();
     }
+}
+
+// ==================== DRAG & DROP REORDERING ====================
+let draggedItem = null;
+
+function setupDragAndDrop(card) {
+    card.addEventListener('dragstart', e => {
+        draggedItem = card;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', '');
+    });
+
+    card.addEventListener('dragend', e => {
+        card.classList.remove('dragging');
+        document.querySelectorAll('.item-card').forEach(c => c.classList.remove('drag-over'));
+        saveData();
+    });
+
+    card.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (draggedItem && draggedItem !== card) {
+            card.classList.add('drag-over');
+        }
+    });
+
+    card.addEventListener('dragleave', e => {
+        card.classList.remove('drag-over');
+    });
+
+    card.addEventListener('drop', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (draggedItem && draggedItem !== card) {
+            const list = card.parentNode;
+            const items = [...list.children];
+            const draggedIdx = items.indexOf(draggedItem);
+            const targetIdx = items.indexOf(card);
+
+            if (draggedIdx < targetIdx) {
+                list.insertBefore(draggedItem, card.nextSibling);
+            } else {
+                list.insertBefore(draggedItem, card);
+            }
+            saveData();
+        }
+        card.classList.remove('drag-over');
+    });
 }
 
 // ==================== JSON EXPORT / IMPORT ====================
@@ -1012,3 +1097,4 @@ window.saveSectionFeedback = saveSectionFeedback;
 window.setSkillLevel = setSkillLevel;
 window.setSkillYears = setSkillYears;
 window.aggregateTechTagsToSkills = aggregateTechTagsToSkills;
+window.setupDragAndDrop = setupDragAndDrop;

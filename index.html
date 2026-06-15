@@ -351,8 +351,11 @@
     <!-- ==================== TEMPLATES ==================== -->
 
     <template id="template-experience">
-        <div class="experience-item item-card">
-            <button type="button" class="btn-remove" onclick="removeParent(this)">&times;</button>
+        <div class="experience-item item-card" draggable="true">
+            <div class="card-top-bar">
+                <span class="drag-handle" title="ドラッグして並び替え">⠿</span>
+                <button type="button" class="btn-remove" onclick="removeParent(this)">&times;</button>
+            </div>
             <div class="form-grid">
                 <div class="cell-date">
                     <div class="form-group">
@@ -379,6 +382,18 @@
                     <div class="form-group">
                         <label class="input-label">役職</label>
                         <textarea class="input-position" rows="1" placeholder="例: リーダー"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="input-label">担当工程</label>
+                        <div class="process-checkboxes">
+                            <label class="process-check"><input type="checkbox" class="proc-requirements" value="要件定義"> 要件定義</label>
+                            <label class="process-check"><input type="checkbox" class="proc-basic-design" value="基本設計"> 基本設計</label>
+                            <label class="process-check"><input type="checkbox" class="proc-detailed-design" value="詳細設計"> 詳細設計</label>
+                            <label class="process-check"><input type="checkbox" class="proc-implementation" value="製造"> 製造</label>
+                            <label class="process-check"><input type="checkbox" class="proc-unit-test" value="単体テスト"> 単体テスト</label>
+                            <label class="process-check"><input type="checkbox" class="proc-integration-test" value="結合テスト"> 結合テスト</label>
+                            <label class="process-check"><input type="checkbox" class="proc-maintenance" value="運用"> 運用</label>
+                        </div>
                     </div>
                     <div class="form-group full-width">
                         <label class="input-label">業務内容 <span class="required-badge">必須</span></label>
