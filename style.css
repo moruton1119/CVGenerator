@@ -1540,6 +1540,8 @@ select {
 
     .sidebar-toggle {
         display: block;
+        font-size: 1.4rem;
+        padding: 0.35rem;
     }
 
     .progress-wrapper {
@@ -1554,7 +1556,7 @@ select {
     }
 
     .progress-text {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
     }
 
     .actions {
@@ -1565,17 +1567,23 @@ select {
 
     .actions .btn,
     .actions .template-dropdown {
-        font-size: 0.7rem;
-        padding: 0.35rem 0.55rem;
+        font-size: 0.78rem;
+        padding: 0.45rem 0.65rem;
     }
 
-    /* Hide text labels on small screens, show icons only */
-    .actions .btn.secondary {
-        font-size: 0;
-        padding: 0.4rem 0.5rem;
+    /* Mobile inputs: minimum 16px to avoid iOS zoom */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="date"],
+    select,
+    textarea {
+        font-size: 16px;
     }
-    .actions .btn.secondary::first-letter {
-        font-size: 1rem;
+
+    .edit-field label {
+        font-size: 0.85rem;
     }
 
     .sidebar {
@@ -1665,51 +1673,125 @@ select {
 }
 
 @media (max-width: 480px) {
-    body { font-size: 13px; }
+    body { font-size: 16px; }
 
-    .app-logo { font-size: 1rem; }
+    .app-logo { font-size: 1.1rem; }
 
     .header-inner {
-        padding: 0.4rem 0.5rem;
-        gap: 0.3rem;
+        padding: 0.5rem 0.75rem;
+        gap: 0.4rem;
     }
 
     .header-left {
-        gap: 0.4rem;
+        gap: 0.5rem;
     }
 
     .sidebar-toggle {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
+        padding: 0.4rem;
     }
 
     .progress-wrapper {
-        gap: 0.4rem;
+        gap: 0.5rem;
+    }
+
+    .progress-text {
+        font-size: 0.8rem;
     }
 
     .actions {
-        gap: 0.2rem;
+        gap: 0.3rem;
     }
 
     .actions .btn,
     .actions .template-dropdown {
-        font-size: 0.65rem;
-        padding: 0.3rem 0.45rem;
+        font-size: 0.8rem;
+        padding: 0.5rem 0.7rem;
+    }
+
+    .main-content {
+        padding: 1rem 0.75rem;
     }
 
     .edit-section-title {
-        font-size: 1rem;
+        font-size: 1.1rem;
         padding: 1rem;
     }
 
     .edit-subsection { padding: 1rem; }
 
-    .page-header h2 { font-size: 1.25rem; }
+    .edit-fields {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
 
-    .tag { font-size: 0.72rem; padding: 0.2rem 0.5rem; }
+    .edit-field label {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
 
-    .actions .btn {
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="date"],
+    select,
+    textarea {
+        padding: 0.8rem 0.9rem !important;
+        font-size: 16px !important;
+    }
+
+    .required-badge {
         font-size: 0.7rem;
-        padding: 0.4rem 0.6rem;
+        padding: 0.15rem 0.5rem;
+    }
+
+    .page-header h2 { font-size: 1.3rem; }
+    .page-subtitle { font-size: 0.85rem; }
+
+    .tag { font-size: 0.78rem; padding: 0.25rem 0.6rem; }
+
+    /* Bigger touch targets for mobile */
+    .btn {
+        min-height: 40px;
+    }
+
+    .btn.small {
+        min-height: 36px;
+    }
+
+    /* Process checkboxes bigger */
+    .process-check {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .process-check input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Skill tags bigger touch area */
+    .skill-tag {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.8rem;
+    }
+
+    /* Sidebar items bigger */
+    .sidebar-item {
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+    }
+
+    .sidebar-icon {
+        font-size: 1.3rem;
+    }
+
+    /* Save button full width */
+    .page-actions .btn-save-section {
+        width: 100%;
+        font-size: 1rem;
+        padding: 0.8rem;
     }
 }
 
