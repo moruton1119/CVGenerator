@@ -27,6 +27,7 @@
                 <span class="progress-text" id="progress-text">入力完了度: 0%</span>
             </div>
             <div class="actions">
+                <button id="btn-darkmode" class="btn secondary" title="ダークモード切替">🌙</button>
                 <select id="template-select" class="btn secondary template-dropdown">
                     <option value="">📋 テンプレート</option>
                     <option value="engineer">💻 エンジニア向け</option>
@@ -34,6 +35,7 @@
                     <option value="manager">📊 PM向け</option>
                     <option value="blank">⬜ 空白</option>
                 </select>
+                <button id="btn-share-url" class="btn secondary" title="URLで共有">🔗 共有</button>
                 <button id="btn-save-json" class="btn secondary">JSON保存</button>
                 <button id="btn-load-json" class="btn secondary">JSON読込</button>
                 <input type="file" id="file-input" style="display:none" accept=".json">
@@ -89,6 +91,24 @@
                     <p class="page-subtitle">氏名や連絡先など、履歴書の基本となる情報を入力します</p>
                 </div>
 
+                <!-- 大項目: プロフィール写真 -->
+                <section class="edit-section">
+                    <h3 class="edit-section-title">プロフィール写真</h3>
+                    <div class="edit-subsection">
+                        <div class="photo-upload-area">
+                            <div class="photo-preview" id="photo-preview">
+                                <span class="photo-placeholder">写真なし</span>
+                            </div>
+                            <div class="photo-controls">
+                                <input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp" style="display:none">
+                                <button class="btn secondary" onclick="document.getElementById('photo-input').click()">📷 写真を選択</button>
+                                <button class="btn danger small" id="btn-remove-photo" style="display:none">🗑️ 削除</button>
+                                <p class="photo-hint">JPG / PNG / WebP・最大5MB</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- 大項目: 個人情報 -->
                 <section class="edit-section">
                     <h3 class="edit-section-title">個人情報</h3>
@@ -104,6 +124,27 @@
                             <div class="edit-field">
                                 <label>フリガナ</label>
                                 <input type="text" id="fullNameKana" placeholder="例: ヤマダ タロウ">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 中項目: 生年月日・性別 -->
+                    <div class="edit-subsection">
+                        <h4 class="edit-subsection-title">生年月日・性別</h4>
+                        <div class="edit-fields">
+                            <div class="edit-field">
+                                <label>生年月日</label>
+                                <input type="date" id="birthDate">
+                            </div>
+                            <div class="edit-field">
+                                <label>性別</label>
+                                <select id="gender">
+                                    <option value="">選択してください</option>
+                                    <option value="男性">男性</option>
+                                    <option value="女性">女性</option>
+                                    <option value="その他">その他</option>
+                                    <option value="回答しない">回答しない</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -348,13 +389,29 @@
     <!-- Toast notification -->
     <div class="toast" id="toast"></div>
 
+    <!-- URL Share Modal -->
+    <div class="share-modal-overlay" id="share-modal">
+        <div class="share-modal">
+            <h3>🔗 URLで共有</h3>
+            <p class="share-hint">以下のURLを共有すると、読み取り専用で閲覧できます。</p>
+            <div class="share-url-box">
+                <input type="text" id="share-url-input" readonly>
+                <button class="btn primary" id="btn-copy-url">コピー</button>
+            </div>
+            <button class="btn secondary" onclick="document.getElementById('share-modal').classList.remove('show')">閉じる</button>
+        </div>
+    </div>
+
     <!-- ==================== TEMPLATES ==================== -->
 
     <template id="template-experience">
         <div class="experience-item item-card" draggable="true">
             <div class="card-top-bar">
                 <span class="drag-handle" title="ドラッグして並び替え">⠿</span>
-                <button type="button" class="btn-remove" onclick="removeParent(this)">&times;</button>
+                <div class="card-actions">
+                    <button type="button" class="btn small card-duplicate" onclick="duplicateExperience(this)" title="複製">📋</button>
+                    <button type="button" class="btn-remove" onclick="removeParent(this)" title="削除">&times;</button>
+                </div>
             </div>
             <div class="form-grid">
                 <div class="cell-date">

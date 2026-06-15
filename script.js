@@ -1,12 +1,21 @@
 // ==================== CVGenerator - Main Script ====================
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadData();
+    // Check for shared data in URL
+    if (loadFromURL()) {
+        // Read-only mode
+        document.body.classList.add('readonly-mode');
+        document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
+        switchPage('preview');
+    } else {
+        loadData();
+    }
     bindStaticInputs();
     bindButtons();
     bindSidebar();
     bindSkillInputs();
     bindSummaryCharCount();
+    restoreDarkMode();
     updateProgress();
 });
 
@@ -28,8 +37,9 @@ function migrateSkillItems(arr) {
 
 // ==================== INPUT BINDING ====================
 function bindStaticInputs() {
-    document.querySelectorAll('#page-personal input, #page-summary textarea, #page-summary input').forEach(input => {
+    document.querySelectorAll('#page-personal input, #page-personal select, #page-summary textarea, #page-summary input').forEach(input => {
         input.addEventListener('input', () => { saveData(); updateProgress(); });
+        input.addEventListener('change', () => { saveData(); updateProgress(); });
         if (input.tagName === 'TEXTAREA') {
             input.addEventListener('input', function() { autoResize(this); });
         }
@@ -53,6 +63,22 @@ function bindButtons() {
     });
     document.getElementById('sidebar-toggle').addEventListener('click', toggleSidebar);
     document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
+
+    // Dark mode
+    document.getElementById('btn-darkmode').addEventListener('click', toggleDarkMode);
+
+    // Photo upload
+    document.getElementById('photo-input').addEventListener('change', handlePhotoUpload);
+    document.getElementById('btn-remove-photo').addEventListener('click', removePhoto);
+
+    // URL share
+    document.getElementById('btn-share-url').addEventListener('click', generateShareURL);
+    document.getElementById('btn-copy-url').addEventListener('click', () => {
+        const input = document.getElementById('share-url-input');
+        input.select();
+        document.execCommand('copy');
+        showToast('URLをコピーしました');
+    });
 
     // Preview controls
     const previewTpl = document.getElementById('preview-template-select');
@@ -164,8 +190,8 @@ function updateProgress() {
     const data = getCurrentData();
     let filled = 0, total = 0;
 
-    // Personal (6 fields)
-    ['fullName', 'jobTitle', 'email', 'phone', 'location', 'website'].forEach(f => {
+    // Personal (8 fields)
+    ['fullName', 'jobTitle', 'email', 'phone', 'location', 'website', 'birthDate', 'gender'].forEach(f => {
         total++;
         if (data.personal[f]) filled++;
     });
@@ -205,7 +231,7 @@ function loadTemplate(key) {
 
     const templates = {
         engineer: {
-            personal: { fullName: '', fullNameKana: '', jobTitle: 'ソフトウェアエンジニア', email: '', phone: '', location: '', website: '' },
+            personal: { fullName: '', fullNameKana: '', birthDate: '', gender: '', jobTitle: 'ソフトウェアエンジニア', email: '', phone: '', location: '', website: '' },
             summary: '〇年間のWebアプリケーション開発経験を持ち、バックエンドからフロントエンドまで幅広い技術スタックを扱ってきました。アジャイル開発チームでの開発プロセス改善や、パフォーマンス最適化の実績があります。',
             experience: [{ company: '', position: 'ソフトウェアエンジニア', status: '正社員', startDate: '', endDate: '', description: '・Webアプリケーションの設計・開発・運用\n・アジャイルチームでのスクラム開発\n・API設計とデータベース最適化', techTags: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'AWS'] }],
             skills: {
@@ -219,7 +245,7 @@ function loadTemplate(key) {
             education: []
         },
         designer: {
-            personal: { fullName: '', fullNameKana: '', jobTitle: 'UI/UXデザイナー', email: '', phone: '', location: '', website: '' },
+            personal: { fullName: '', fullNameKana: '', birthDate: '', gender: '', jobTitle: 'UI/UXデザイナー', email: '', phone: '', location: '', website: '' },
             summary: 'ユーザー中心のデザインプロセスに精通し、Web・モバイルアプリケーションのUI/UXデザインを担当。ユーザーリサーチからプロトタイピング、デザインシステムの構築まで一貫して手がけています。',
             experience: [{ company: '', position: 'UI/UXデザイナー', status: '正社員', startDate: '', endDate: '', description: '・Web・アプリのUI/UXデザイン\n・デザインシステムの構築・運用\n・ユーザーテストと改善施策の実施', techTags: ['Figma', 'Adobe XD', 'Photoshop'] }],
             skills: {
@@ -233,7 +259,7 @@ function loadTemplate(key) {
             education: []
         },
         manager: {
-            personal: { fullName: '', fullNameKana: '', jobTitle: 'プロジェクトマネージャー', email: '', phone: '', location: '', website: '' },
+            personal: { fullName: '', fullNameKana: '', birthDate: '', gender: '', jobTitle: 'プロジェクトマネージャー', email: '', phone: '', location: '', website: '' },
             summary: '〇年のプロジェクトマネジメント経験。大規模システム開発プロジェクトの計画・進行管理から、ステークホルダー調整、チームビルディングまで幅広く対応。PMP資格保有。',
             experience: [{ company: '', position: 'プロジェクトマネージャー', status: '正社員', startDate: '', endDate: '', description: '・プロジェクト計画策定と進行管理\n・要件定義・基本設計のリード\n・品質管理・リスク管理', techTags: ['Jira', 'Confluence', 'MS Project'] }],
             skills: {
@@ -247,7 +273,7 @@ function loadTemplate(key) {
             education: []
         },
         blank: {
-            personal: { fullName: '', fullNameKana: '', jobTitle: '', email: '', phone: '', location: '', website: '' },
+            personal: { fullName: '', fullNameKana: '', birthDate: '', gender: '', jobTitle: '', email: '', phone: '', location: '', website: '' },
             summary: '',
             experience: [],
             skills: { languages: [], frameworks: [], tools: [], cloud: [], other: [] },
@@ -571,11 +597,14 @@ function getCurrentData() {
         personal: {
             fullName: getValue('fullName'),
             fullNameKana: getValue('fullNameKana'),
+            birthDate: getValue('birthDate'),
+            gender: getValue('gender'),
             jobTitle: getValue('jobTitle'),
             email: getValue('email'),
             phone: getValue('phone'),
             location: getValue('location'),
-            website: getValue('website')
+            website: getValue('website'),
+            photo: photoData || ''
         },
         summary: getValue('summary'),
         experience: getExperienceData(),
@@ -657,11 +686,17 @@ function restoreData(data) {
     // Personal
     setValue('fullName', data.personal.fullName);
     setValue('fullNameKana', data.personal.fullNameKana);
+    setValue('birthDate', data.personal.birthDate);
+    setValue('gender', data.personal.gender);
     setValue('jobTitle', data.personal.jobTitle);
     setValue('email', data.personal.email);
     setValue('phone', data.personal.phone);
     setValue('location', data.personal.location);
     setValue('website', data.personal.website);
+
+    // Restore photo
+    photoData = data.personal.photo || null;
+    renderPhoto();
 
     // Summary
     setValue('summary', data.summary);
@@ -728,8 +763,20 @@ function renderPreview() {
     // Build each section as a function
     const buildHeader = () => {
         let html = '<div class="preview-header">';
+        // Photo
+        if (data.personal.photo) {
+            html += `<img src="${data.personal.photo}" class="preview-photo" alt="" style="float:right;width:80px;height:96px;object-fit:cover;border-radius:8px;margin-left:1rem;">`;
+        }
         html += `<h1>${escHtml(data.personal.fullName || '氏名未入力')}</h1>`;
         if (data.personal.fullNameKana) html += `<div style="font-size:0.85rem;color:var(--text-light);margin-bottom:0.3rem;">${escHtml(data.personal.fullNameKana)}</div>`;
+        // Birth date & gender
+        const personalInfo = [];
+        if (data.personal.birthDate) {
+            const d = new Date(data.personal.birthDate);
+            personalInfo.push(`生年月日: ${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`);
+        }
+        if (data.personal.gender) personalInfo.push(`性別: ${escHtml(data.personal.gender)}`);
+        if (personalInfo.length > 0) html += `<div style="font-size:0.8rem;color:var(--text-light);margin-bottom:0.3rem;">${personalInfo.join(' / ')}</div>`;
         if (data.personal.jobTitle) html += `<div class="preview-jobtitle">${escHtml(data.personal.jobTitle)}</div>`;
         html += '<div class="preview-contact">';
         if (data.personal.email) html += `<span>📧 ${escHtml(data.personal.email)}</span>`;
@@ -737,6 +784,7 @@ function renderPreview() {
         if (data.personal.location) html += `<span>📍 ${escHtml(data.personal.location)}</span>`;
         if (data.personal.website) html += `<span>🔗 ${escHtml(data.personal.website)}</span>`;
         html += '</div></div>';
+        html += '<div style="clear:both;"></div>';
         return html;
     };
 
@@ -773,6 +821,26 @@ function renderPreview() {
     const buildExperience = () => {
         if (sortedExp.length === 0) return '';
         let html = '<div class="preview-section"><h3 class="preview-section-title">職務経歴</h3>';
+        
+        // Career summary
+        const summary = calculateCareerSummary(sortedExp);
+        if (summary && summary.careerPeriod) {
+            html += '<div class="preview-career-summary">';
+            html += `<div class="summary-stat"><span class="summary-stat-label">キャリア期間</span><span class="summary-stat-value">${summary.careerPeriod}</span></div>`;
+            html += `<div class="summary-stat"><span class="summary-stat-label">経歴数</span><span class="summary-stat-value">${summary.totalExp}件</span></div>`;
+            const procEntries = Object.entries(summary.processCount);
+            if (procEntries.length > 0) {
+                html += '<div class="summary-stat" style="flex-basis:100%;"><span class="summary-stat-label">担当工程集計</span><div class="summary-process-stats">';
+                const procOrder = ['要件定義','基本設計','詳細設計','製造','単体テスト','結合テスト','運用'];
+                procEntries.sort((a,b) => procOrder.indexOf(a[0]) - procOrder.indexOf(b[0]));
+                procEntries.forEach(([proc, count]) => {
+                    html += `<span class="summary-process-badge">${escHtml(proc)} <span class="summary-process-count">${count}</span></span>`;
+                });
+                html += '</div></div>';
+            }
+            html += '</div>';
+        }
+
         html += '<div class="preview-experience-list">';
         sortedExp.forEach(exp => {
             html += '<div class="preview-exp-card"><div class="preview-exp-date">';
@@ -1050,6 +1118,157 @@ function clearData() {
     }
 }
 
+let photoData = null;
+
+// ==================== PHOTO UPLOAD ====================
+function handlePhotoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('ファイルサイズが大きすぎます（最大5MB）');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        photoData = e.target.result;
+        renderPhoto();
+        saveData();
+    };
+    reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+    photoData = null;
+    document.getElementById('photo-input').value = '';
+    renderPhoto();
+    saveData();
+}
+
+function renderPhoto() {
+    const preview = document.getElementById('photo-preview');
+    const removeBtn = document.getElementById('btn-remove-photo');
+    if (photoData) {
+        preview.innerHTML = `<img src="${photoData}" alt="プロフィール写真">`;
+        removeBtn.style.display = '';
+    } else {
+        preview.innerHTML = '<span class="photo-placeholder">写真なし</span>';
+        removeBtn.style.display = 'none';
+    }
+}
+
+// ==================== DARK MODE ====================
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    document.getElementById('btn-darkmode').classList.toggle('active', isDark);
+    document.getElementById('btn-darkmode').textContent = isDark ? '☀️' : '🌙';
+    localStorage.setItem('cv_darkmode', isDark ? '1' : '0');
+}
+
+function restoreDarkMode() {
+    if (localStorage.getItem('cv_darkmode') === '1') {
+        toggleDarkMode();
+    }
+}
+
+// ==================== DUPLICATE EXPERIENCE ====================
+function duplicateExperience(btn) {
+    const card = btn.closest('.item-card');
+    const data = getExperienceData();
+    const allCards = document.querySelectorAll('#experience-list .item-card');
+    const idx = Array.from(allCards).indexOf(card);
+    if (idx >= 0 && data[idx]) {
+        const clone = JSON.parse(JSON.stringify(data[idx]));
+        addExperience(clone);
+        showToast('経歴を複製しました');
+        saveData();
+    }
+}
+
+// ==================== URL SHARE ====================
+function generateShareURL() {
+    saveData();
+    const data = getCurrentData();
+    // Strip photo data (too large for URL)
+    const dataCopy = JSON.parse(JSON.stringify(data));
+    if (dataCopy.personal) delete dataCopy.personal.photo;
+    const json = JSON.stringify(dataCopy);
+    // Compress with btoa (base64 encode UTF-8)
+    const encoded = btoa(unescape(encodeURIComponent(json)));
+    const url = window.location.origin + window.location.pathname + '#d=' + encoded;
+    document.getElementById('share-url-input').value = url;
+    document.getElementById('share-modal').classList.add('show');
+}
+
+function loadFromURL() {
+    const hash = window.location.hash;
+    if (!hash || !hash.startsWith('#d=')) return false;
+    try {
+        const encoded = hash.substring(3);
+        const json = decodeURIComponent(escape(atob(encoded)));
+        const data = JSON.parse(json);
+        skillsData = { languages: [], frameworks: [], tools: [], cloud: [], other: [] };
+        if (data.skills) {
+            ['languages','frameworks','tools','cloud','other'].forEach(k => {
+                skillsData[k] = migrateSkillItems(data.skills[k] || []);
+            });
+        }
+        restoreData(data);
+        renderAllSkillTags();
+        return true;
+    } catch(e) {
+        console.error('URL load failed', e);
+        return false;
+    }
+}
+
+// ==================== CAREER SUMMARY ====================
+function calculateCareerSummary(experiences) {
+    if (!experiences || experiences.length === 0) return null;
+    
+    // Parse dates
+    const parseDate = (str) => {
+        if (!str) return null;
+        const m = str.match(/(\d{4})[\/\-年](\d{1,2})/);
+        if (m) return new Date(parseInt(m[1]), parseInt(m[2]) - 1);
+        return null;
+    };
+
+    let earliest = null, latest = null;
+    const processCount = {};
+    let totalExp = 0;
+
+    experiences.forEach(exp => {
+        const start = parseDate(exp.startDate);
+        const end = exp.endDate ? parseDate(exp.endDate) : new Date();
+        if (start) {
+            if (!earliest || start < earliest) earliest = start;
+        }
+        if (end) {
+            if (!latest || end > latest) latest = end;
+        }
+        // Count processes
+        (exp.processes || []).forEach(p => {
+            processCount[p] = (processCount[p] || 0) + 1;
+        });
+        totalExp++;
+    });
+
+    let careerPeriod = '';
+    if (earliest && latest) {
+        const months = (latest.getFullYear() - earliest.getFullYear()) * 12 + (latest.getMonth() - earliest.getMonth());
+        const years = Math.floor(months / 12);
+        const remMonths = months % 12;
+        careerPeriod = `${years}年${remMonths}ヶ月`;
+    }
+
+    return {
+        careerPeriod,
+        totalExp,
+        processCount
+    };
+}
+
 // ==================== UTILITIES ====================
 function getValue(id) {
     const el = document.getElementById(id);
@@ -1098,3 +1317,4 @@ window.setSkillLevel = setSkillLevel;
 window.setSkillYears = setSkillYears;
 window.aggregateTechTagsToSkills = aggregateTechTagsToSkills;
 window.setupDragAndDrop = setupDragAndDrop;
+window.duplicateExperience = duplicateExperience;
