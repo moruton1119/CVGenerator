@@ -15,8 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
     bindSidebar();
     bindSkillInputs();
     bindSummaryCharCount();
+    bindKeyboardShortcuts();
+    bindValidation();
     restoreDarkMode();
     updateProgress();
+    updateSkillCounts();
 });
 
 // ==================== CONSTANTS ====================
@@ -51,6 +54,10 @@ function bindButtons() {
     document.getElementById('btn-load-json').addEventListener('click', () => document.getElementById('file-input').click());
     document.getElementById('file-input').addEventListener('change', loadJSON);
     document.getElementById('btn-print').addEventListener('click', () => {
+        const missing = validateRequiredFields();
+        if (missing.length > 0) {
+            showToast(`⚠️ 必須項目が${missing.length}個未入力です（そのまま出力できます）`);
+        }
         switchPage('preview');
         setTimeout(() => window.print(), 400);
     });
@@ -352,6 +359,7 @@ function renderSkillTags(category) {
 
         container.appendChild(el);
     });
+    updateSkillCount(category);
 }
 
 function showSkillEditor(tagEl, category, index) {
@@ -421,6 +429,7 @@ function showSkillEditor(tagEl, category, index) {
 
 function renderAllSkillTags() {
     ['languages', 'frameworks', 'tools', 'cloud', 'other'].forEach(c => renderSkillTags(c));
+    updateSkillCounts();
 }
 
 // ==================== TECH TAGS (experience items) + AGGREGATION ====================
@@ -658,6 +667,16 @@ function getCertificationData() {
 
 function saveData() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(getCurrentData()));
+    showSaveIndicator();
+}
+
+let saveIndicatorTimer = null;
+function showSaveIndicator() {
+    const el = document.getElementById('save-indicator');
+    if (!el) return;
+    el.classList.add('show');
+    clearTimeout(saveIndicatorTimer);
+    saveIndicatorTimer = setTimeout(() => el.classList.remove('show'), 2000);
 }
 
 function loadData() {
@@ -1104,40 +1123,67 @@ function clearData() {
     }
 }
 
-// ==================== PHOTO UPLOAD ====================
-function handlePhotoUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-        showToast('ファイルサイズが大きすぎます（最大5MB）');
-        return;
-    }
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        photoData = e.target.result;
-        renderPhoto();
-        saveData();
-    };
-    reader.readAsDataURL(file);
+// ==================== SKILL COUNTS ====================
+function updateSkillCount(category) {
+    const badge = document.querySelector(`.skill-count-badge[data-skill-count="${category}"]`);
+    if (badge) badge.textContent = (skillsData[category] || []).length;
 }
 
-function removePhoto() {
-    photoData = null;
-    document.getElementById('photo-input').value = '';
-    renderPhoto();
-    saveData();
+function updateSkillCounts() {
+    ['languages', 'frameworks', 'tools', 'cloud', 'other'].forEach(c => updateSkillCount(c));
 }
 
-function renderPhoto() {
-    const preview = document.getElementById('photo-preview');
-    const removeBtn = document.getElementById('btn-remove-photo');
-    if (photoData) {
-        preview.innerHTML = `<img src="${photoData}" alt="プロフィール写真">`;
-        removeBtn.style.display = '';
-    } else {
-        preview.innerHTML = '<span class="photo-placeholder">写真なし</span>';
-        removeBtn.style.display = 'none';
-    }
+// ==================== KEYBOARD SHORTCUTS ====================
+function bindKeyboardShortcuts() {
+    document.addEventListener('keydown', e => {
+        // Ctrl+S = Save
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            saveData();
+            updateProgress();
+            showToast('💾 保存しました');
+        }
+        // Ctrl+P = Preview & Print
+        if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+            e.preventDefault();
+            // Check required fields before printing
+            const missing = validateRequiredFields();
+            if (missing.length > 0) {
+                showToast(`⚠️ 必須項目が${missing.length}個未入力です`);
+            }
+            switchPage('preview');
+            setTimeout(() => window.print(), 400);
+        }
+    });
+}
+
+// ==================== VALIDATION ====================
+function bindValidation() {
+    document.querySelectorAll('[data-required]').forEach(input => {
+        input.addEventListener('blur', () => {
+            if (!input.value.trim()) {
+                input.classList.add('invalid');
+            } else {
+                input.classList.remove('invalid');
+            }
+        });
+        input.addEventListener('input', () => {
+            if (input.value.trim()) {
+                input.classList.remove('invalid');
+            }
+        });
+    });
+}
+
+function validateRequiredFields() {
+    const missing = [];
+    document.querySelectorAll('[data-required]').forEach(input => {
+        if (!input.value.trim()) {
+            missing.push(input);
+            input.classList.add('invalid');
+        }
+    });
+    return missing;
 }
 
 // ==================== DARK MODE ====================
@@ -1300,3 +1346,5 @@ window.setSkillYears = setSkillYears;
 window.aggregateTechTagsToSkills = aggregateTechTagsToSkills;
 window.setupDragAndDrop = setupDragAndDrop;
 window.duplicateExperience = duplicateExperience;
+window.validateRequiredFields = validateRequiredFields;
+window.updateSkillCounts = updateSkillCounts;

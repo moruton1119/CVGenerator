@@ -5,6 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CVGenerator - 職務経歴書メーカー</title>
+
+    <!-- OGP / Meta -->
+    <meta name="description" content="職務経歴書を簡単に作成・PDF出力できる無料ツール。スキル管理、経歴の整理、プレビュー機能を搭載。">
+    <meta name="keywords" content="職務経歴書,履歴書,CV,レジュメ,PDF,スキル,経歴書メーカー,転職">
+    <meta name="author" content="CVGenerator">
+    <meta name="theme-color" content="#4f46e5">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="CVGenerator - 職務経歴書メーカー">
+    <meta property="og:description" content="職務経歴書を簡単に作成・PDF出力できる無料ツール。スキル管理、経歴の整理、プレビュー機能を搭載。">
+    <meta property="og:url" content="https://moruton1119.github.io/CVGenerator/">
+    <meta property="og:site_name" content="CVGenerator">
+    <meta property="og:locale" content="ja_JP">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CVGenerator - 職務経歴書メーカー">
+    <meta name="twitter:description" content="職務経歴書を簡単に作成・PDF出力できる無料ツール。">
+
+    <!-- Favicon (emoji) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📄</text></svg>">
+
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,6 +48,7 @@
                     <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
                 </div>
                 <span class="progress-text" id="progress-text">入力完了度: 0%</span>
+                <span class="save-indicator" id="save-indicator">✅ 自動保存済み</span>
             </div>
             <div class="actions">
                 <button id="btn-darkmode" class="btn secondary icon-btn" title="ダークモード切替">🌙</button>
@@ -246,7 +270,7 @@
                     </div>
 
                     <div class="edit-subsection">
-                        <h4 class="edit-subsection-title">プログラミング言語 <span class="required-badge">必須</span></h4>
+                        <h4 class="edit-subsection-title">プログラミング言語 <span class="required-badge">必須</span> <span class="skill-count-badge" data-skill-count="languages">0</span></h4>
                         <div class="edit-fields">
                             <div class="edit-field edit-field-full">
                                 <div class="tag-input-container">
@@ -258,7 +282,7 @@
                     </div>
 
                     <div class="edit-subsection">
-                        <h4 class="edit-subsection-title">フレームワーク・ライブラリ</h4>
+                        <h4 class="edit-subsection-title">フレームワーク・ライブラリ <span class="skill-count-badge" data-skill-count="frameworks">0</span></h4>
                         <div class="edit-fields">
                             <div class="edit-field edit-field-full">
                                 <div class="tag-input-container">
@@ -270,7 +294,7 @@
                     </div>
 
                     <div class="edit-subsection">
-                        <h4 class="edit-subsection-title">ツール・ミドルウェア</h4>
+                        <h4 class="edit-subsection-title">ツール・ミドルウェア <span class="skill-count-badge" data-skill-count="tools">0</span></h4>
                         <div class="edit-fields">
                             <div class="edit-field edit-field-full">
                                 <div class="tag-input-container">
@@ -282,7 +306,7 @@
                     </div>
 
                     <div class="edit-subsection">
-                        <h4 class="edit-subsection-title">クラウド・インフラ</h4>
+                        <h4 class="edit-subsection-title">クラウド・インフラ <span class="skill-count-badge" data-skill-count="cloud">0</span></h4>
                         <div class="edit-fields">
                             <div class="edit-field edit-field-full">
                                 <div class="tag-input-container">
@@ -294,7 +318,7 @@
                     </div>
 
                     <div class="edit-subsection">
-                        <h4 class="edit-subsection-title">その他</h4>
+                        <h4 class="edit-subsection-title">その他 <span class="skill-count-badge" data-skill-count="other">0</span></h4>
                         <div class="edit-fields">
                             <div class="edit-field edit-field-full">
                                 <div class="tag-input-container">

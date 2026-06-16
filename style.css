@@ -652,7 +652,57 @@ textarea {
     background: var(--primary-light);
 }
 
-/* ==================== CAREER SUMMARY (preview) ==================== */
+/* ==================== SAVE INDICATOR ==================== */
+.save-indicator {
+    font-size: 0.7rem;
+    color: #10b981;
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+}
+
+.save-indicator.show {
+    opacity: 1;
+}
+
+body.dark-mode .save-indicator {
+    color: #34d399;
+}
+
+/* ==================== SKILL COUNT BADGE ==================== */
+.skill-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.4rem;
+    border-radius: 9999px;
+    background: var(--primary-color);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-left: 0.3rem;
+}
+
+/* ==================== VALIDATION ==================== */
+input[data-required].invalid,
+textarea[data-required].invalid {
+    border-color: var(--danger-color) !important;
+    background: var(--danger-bg) !important;
+}
+
+.validation-warning {
+    color: var(--danger-color);
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    display: none;
+}
+
+.validation-warning.show {
+    display: block;
+}
+
 .preview-career-summary {
     display: flex;
     flex-wrap: wrap;
