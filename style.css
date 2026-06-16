@@ -1520,49 +1520,23 @@ select {
 @media (max-width: 768px) {
     .header-inner {
         flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: 0.4rem;
         padding: 0.5rem 0.75rem;
     }
 
-    .main-content {
-        padding: 1rem;
-        margin-left: 0;
-    }
-
+    /* Row 1: hamburger + logo only */
     .header-left {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .app-logo {
-        font-size: 1.1rem;
-    }
-
-    .sidebar-toggle {
-        display: block;
-        font-size: 1.4rem;
-        padding: 0.35rem;
-    }
-
-    .progress-wrapper {
-        order: 3;
-        max-width: 100%;
+        flex: 0 0 auto;
         width: 100%;
-        gap: 0.5rem;
+        order: 1;
     }
 
-    .progress-bar {
-        height: 6px;
-    }
-
-    .progress-text {
-        font-size: 0.75rem;
-    }
-
+    /* Row 2: actions + progress */
     .actions {
+        order: 2;
+        flex: 1 1 auto;
         flex-wrap: nowrap;
         gap: 0.25rem;
-        order: 2;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
@@ -1571,24 +1545,11 @@ select {
         display: none;
     }
 
-    .actions .btn,
-    .actions .template-dropdown {
-        font-size: 0.78rem;
-        padding: 0.45rem 0.55rem;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-
-    /* Icon-only buttons on mobile */
-    .icon-btn {
-        padding: 0.45rem 0.5rem !important;
-        font-size: 1.1rem !important;
-    }
-
-    .template-dropdown {
-        max-width: 110px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    .progress-wrapper {
+        order: 3;
+        width: 100%;
+        max-width: 100%;
+        gap: 0.5rem;
     }
 
     /* Mobile inputs: minimum 16px to avoid iOS zoom */
@@ -1604,6 +1565,40 @@ select {
 
     .edit-field label {
         font-size: 0.85rem;
+    }
+
+    .app-logo {
+        font-size: 1.1rem;
+    }
+
+    .sidebar-toggle {
+        display: block;
+        font-size: 1.4rem;
+        padding: 0.35rem;
+    }
+
+    .actions .btn,
+    .actions .template-dropdown {
+        font-size: 0.78rem;
+        padding: 0.45rem 0.55rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .icon-btn {
+        padding: 0.45rem 0.5rem !important;
+        font-size: 1.1rem !important;
+    }
+
+    .template-dropdown {
+        max-width: 110px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .main-content {
+        padding: 1rem;
+        margin-left: 0;
     }
 
     .sidebar {
