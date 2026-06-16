@@ -83,6 +83,31 @@ function bindButtons() {
         showToast('URLをコピーしました');
     });
 
+    // Markdown export
+    document.getElementById('btn-export-md').addEventListener('click', exportMarkdown);
+
+    // Preview zoom
+    let zoomLevel = 100;
+    const zoomEl = document.getElementById('preview-content');
+    const zoomLabel = document.getElementById('zoom-level');
+    function applyZoom() {
+        const scale = zoomLevel / 100;
+        zoomEl.style.transform = `scale(${scale})`;
+        zoomLabel.textContent = zoomLevel + '%';
+    }
+    document.getElementById('btn-zoom-in').addEventListener('click', () => {
+        zoomLevel = Math.min(zoomLevel + 10, 200);
+        applyZoom();
+    });
+    document.getElementById('btn-zoom-out').addEventListener('click', () => {
+        zoomLevel = Math.max(zoomLevel - 10, 50);
+        applyZoom();
+    });
+    document.getElementById('btn-zoom-reset').addEventListener('click', () => {
+        zoomLevel = 100;
+        applyZoom();
+    });
+
     // Preview controls
     const previewTpl = document.getElementById('preview-template-select');
     const previewSort = document.getElementById('preview-sort-select');
@@ -851,6 +876,8 @@ function renderPreview() {
             html += '<div class="preview-exp-card"><div class="preview-exp-date">';
             html += escHtml(exp.startDate || '');
             if (exp.endDate) html += `<br>〜 ${escHtml(exp.endDate)}`;
+            const dur = calculateDuration(exp.startDate, exp.endDate);
+            if (dur) html += `<br><span style="font-size:0.75rem;color:var(--primary-color);font-weight:600;">${dur}</span>`;
             html += '</div><div class="preview-exp-content">';
             if (exp.company) html += `<div class="preview-exp-company">${escHtml(exp.company)}</div>`;
             if (exp.status) html += `<div class="preview-exp-status">${escHtml(exp.status)}</div>`;
@@ -976,6 +1003,9 @@ function addExperience(data = {}) {
     const newItem = document.getElementById('experience-list').lastElementChild;
     newItem.querySelectorAll('textarea').forEach(el => autoResize(el));
 
+    // Update duration display
+    updateDuration(newItem);
+
     // Setup drag and drop for this card
     setupDragAndDrop(newItem);
 }
@@ -1015,6 +1045,10 @@ function setupDynamicInputs(fragment) {
     // Checkboxes
     fragment.querySelectorAll('input[type="checkbox"]').forEach(cb => {
         cb.addEventListener('change', () => { saveData(); updateProgress(); });
+    });
+    // Duration calculation for experience items
+    fragment.querySelectorAll('.input-startDate, .input-endDate').forEach(input => {
+        input.addEventListener('input', () => updateDuration(input.closest('.item-card')));
     });
 }
 
@@ -1186,6 +1220,167 @@ function validateRequiredFields() {
     return missing;
 }
 
+// ==================== DURATION CALCULATION ====================
+function calculateDuration(startDate, endDate) {
+    const parseDate = (str) => {
+        if (!str) return null;
+        const m = str.match(/(\d{4})[\/\-年](\d{1,2})/);
+        if (m) return new Date(parseInt(m[1]), parseInt(m[2]) - 1);
+        return null;
+    };
+
+    const start = parseDate(startDate);
+    const end = endDate ? parseDate(endDate) : new Date();
+    if (!start) return '';
+
+    const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+    if (months < 0) return '';
+    const years = Math.floor(months / 12);
+    const remMonths = months % 12;
+
+    let result = '';
+    if (years > 0) result += years + '年';
+    if (remMonths > 0) result += remMonths + 'ヶ月';
+    if (!endDate && result) result += '〜';
+    return result ? '（' + result + '）' : '';
+}
+
+function updateDuration(card) {
+    if (!card) return;
+    const startDate = card.querySelector('.input-startDate');
+    const endDate = card.querySelector('.input-endDate');
+    const display = card.querySelector('.duration-display');
+    if (!startDate || !endDate || !display) return;
+    const duration = calculateDuration(startDate.value, endDate.value);
+    display.textContent = duration;
+}
+
+// ==================== MARKDOWN EXPORT ====================
+function exportMarkdown() {
+    saveData();
+    const data = getCurrentData();
+    let md = '';
+
+    // Header
+    md += `# ${data.personal.fullName || '氏名未入力'}\n`;
+    if (data.personal.fullNameKana) md += `*${data.personal.fullNameKana}*\n`;
+    md += '\n';
+
+    // Personal info
+    const info = [];
+    if (data.personal.jobTitle) info.push(`**役職:** ${data.personal.jobTitle}`);
+    if (data.personal.birthDate) {
+        const d = new Date(data.personal.birthDate);
+        info.push(`**生年月日:** ${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`);
+    }
+    if (data.personal.gender) info.push(`**性別:** ${data.personal.gender}`);
+    if (data.personal.email) info.push(`📧 ${data.personal.email}`);
+    if (data.personal.phone) info.push(`📱 ${data.personal.phone}`);
+    if (data.personal.location) info.push(`📍 ${data.personal.location}`);
+    if (data.personal.website) info.push(`🔗 ${data.personal.website}`);
+    if (info.length > 0) {
+ md += info.join(' / ') + '\n\n';
+    }
+
+    md += '---\n\n';
+
+    // Summary
+    if (data.summary) {
+        md += `## 自己PR\n\n${data.summary}\n\n---\n\n`;
+    }
+
+    // Experience
+    if (data.experience.length > 0) {
+        md += '## 職務経歴\n\n';
+        const summary = calculateCareerSummary(data.experience);
+        if (summary && summary.careerPeriod) {
+            md += `> **キャリア期間:** ${summary.careerPeriod} | **経歴数:** ${summary.totalExp}件\n\n`;
+        }
+        data.experience.forEach((exp, i) => {
+            const duration = calculateDuration(exp.startDate, exp.endDate);
+            md += `### ${exp.company || '(企業名未入力)'}\n`;
+            const meta = [];
+            if (exp.startDate) meta.push(exp.startDate);
+            if (exp.endDate) meta.push('〜 ' + exp.endDate);
+            if (duration) meta.push(duration);
+            if (exp.status) meta.push(exp.status);
+            if (exp.position) meta.push(exp.position);
+            if (meta.length > 0) md += `*${meta.join(' / ')}*\n`;
+            md += '\n';
+            if (exp.processes && exp.processes.length > 0) {
+                md += `**担当工程:** ${exp.processes.join(', ')}\n\n`;
+            }
+            if (exp.description) {
+                md += exp.description.split('\n').map(l => l.trim()).filter(l => l).join('\n') + '\n\n';
+            }
+            if (exp.techTags && exp.techTags.length > 0) {
+                md += `**使用技術:** ${exp.techTags.map(t => '\`' + t + '\`').join(' ')}\n\n`;
+            }
+            if (i < data.experience.length - 1) md += '---\n\n';
+        });
+        md += '\n---\n\n';
+    }
+
+    // Skills
+    const hasSkills = Object.values(data.skills).some(arr => arr.length > 0);
+    if (hasSkills) {
+        md += '## スキル\n\n';
+        const labels = { languages: 'プログラミング言語', frameworks: 'フレームワーク・ライブラリ', tools: 'ツール・ミドルウェア', cloud: 'クラウド・インフラ', other: 'その他' };
+        Object.entries(labels).forEach(([key, label]) => {
+            if (data.skills[key] && data.skills[key].length > 0) {
+                md += `### ${label}\n\n`;
+                data.skills[key].forEach(skill => {
+                    const stars = '★'.repeat(skill.level || 3) + '☆'.repeat(5 - (skill.level || 3));
+                    let line = `- **${skill.name}** ${stars}`;
+                    if (skill.years) line += ` (${skill.years})`;
+                    if (skill.fromExp) line += ' 🔄経歴';
+                    md += line + '\n';
+                });
+                md += '\n';
+            }
+        });
+        md += '---\n\n';
+    }
+
+    // Certifications
+    if (data.certifications.length > 0) {
+        md += '## 保有資格\n\n';
+        data.certifications.forEach(cert => {
+            let line = `- **${cert.name || ''}**`;
+            if (cert.date) line += ` (${cert.date})`;
+            if (cert.issuer) line += ` - ${cert.issuer}`;
+            md += line + '\n';
+        });
+        md += '\n---\n\n';
+    }
+
+    // Education
+    if (data.education.length > 0) {
+        md += '## 学歴\n\n';
+        data.education.forEach(edu => {
+            let line = `- `;
+            if (edu.gradDate) line += `${edu.gradDate} `;
+            if (edu.institution) line += `**${edu.institution}**`;
+            if (edu.degree) line += ` ${edu.degree}`;
+            md += line + '\n';
+        });
+    }
+
+    md += '\n---\n\n*Generated by [CVGenerator](https://moruton1119.github.io/CVGenerator/)*\n';
+
+    // Download
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `resume_${(data.personal.fullName || 'data').replace(/\s/g, '_')}_${new Date().toISOString().slice(0, 10)}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('📝 Markdownをエクスポートしました');
+}
+
 // ==================== DARK MODE ====================
 function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
@@ -1348,3 +1543,6 @@ window.setupDragAndDrop = setupDragAndDrop;
 window.duplicateExperience = duplicateExperience;
 window.validateRequiredFields = validateRequiredFields;
 window.updateSkillCounts = updateSkillCounts;
+window.exportMarkdown = exportMarkdown;
+window.calculateDuration = calculateDuration;
+window.updateDuration = updateDuration;

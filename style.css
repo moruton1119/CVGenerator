@@ -703,6 +703,42 @@ textarea[data-required].invalid {
     display: block;
 }
 
+/* ==================== PREVIEW ZOOM ==================== */
+.zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-left: 0.5rem;
+}
+
+.zoom-level {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    min-width: 3rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+#preview-content {
+    transition: transform 0.2s ease;
+    transform-origin: top center;
+}
+
+/* ==================== DURATION DISPLAY ==================== */
+.duration-display {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-top: 0.3rem;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.duration-display:empty {
+    display: none;
+}
+
 .preview-career-summary {
     display: flex;
     flex-wrap: wrap;
@@ -1655,13 +1691,18 @@ select {
 
     .preview-toolbar-info {
         flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: 0.4rem;
         font-size: 0.8rem;
     }
 
     .preview-toolbar-info select {
         font-size: 14px;
         padding: 0.5rem 0.6rem;
+    }
+
+    .zoom-controls {
+        margin-left: 0;
+        margin-top: 0.25rem;
     }
 
     .preview-toolbar .btn {

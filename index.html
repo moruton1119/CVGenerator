@@ -63,6 +63,7 @@
                 <button id="btn-save-json" class="btn secondary icon-btn" title="JSON保存">💾</button>
                 <button id="btn-load-json" class="btn secondary icon-btn" title="JSON読込">📂</button>
                 <input type="file" id="file-input" style="display:none" accept=".json">
+                <button id="btn-export-md" class="btn secondary icon-btn" title="Markdownエクスポート">📝</button>
                 <button id="btn-print" class="btn primary">📄 PDF</button>
                 <button id="btn-clear" class="btn danger">🗑️</button>
             </div>
@@ -377,6 +378,12 @@
                             <option value="new">時系列（新→旧）</option>
                             <option value="old">時系列（旧→新）</option>
                         </select>
+                        <div class="zoom-controls">
+                            <button class="btn secondary icon-btn" id="btn-zoom-out" title="縮小">➖</button>
+                            <span class="zoom-level" id="zoom-level">100%</span>
+                            <button class="btn secondary icon-btn" id="btn-zoom-in" title="拡大">➕</button>
+                            <button class="btn secondary icon-btn" id="btn-zoom-reset" title="リセット">🎯</button>
+                        </div>
                     </div>
                     <button class="btn primary" id="btn-save-pdf">📄 PDFを保存</button>
                 </div>
@@ -430,6 +437,7 @@
                         <label class="input-label">終了日</label>
                         <input type="text" class="input-endDate" placeholder="YYYY/MM">
                     </div>
+                    <span class="duration-display" data-duration></span>
                 </div>
                 <div class="cell-content">
                     <div class="form-group row-group">
