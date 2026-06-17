@@ -90,4 +90,4 @@ git branch -d feature/追加する機能名
 
 ## ライセンス
 
-© 2026 CVGenerator By Antigravity
+© 2026 CVGenerator By Moruton
